@@ -1,6 +1,8 @@
 # CastleEarly welcomes search engines and AI assistants.
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # AI search and answer engines (explicitly allowed so they can cite CastleEarly)
 User-agent: GPTBot

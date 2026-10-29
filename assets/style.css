@@ -689,3 +689,76 @@ main.has-hero > .page-hero:first-child { margin-top: 0; }
   .logo { font-size: 1.15rem; }
 }
 @media (min-width: 761px) and (max-width: 900px) { .logo .castle-logo { display: none; } .nav { gap: 6px; } }
+
+/* ---------- Feedback & reviews page ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.fb [hidden], .adm [hidden], .adm[hidden] { display: none !important; }
+.fb { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px 24px; margin: 8px 0 34px; }
+.fb h2 { margin-top: 0; }
+.fb-form fieldset { border: 0; padding: 0; margin: 0 0 18px; min-width: 0; }
+.fb-form legend { font-weight: 600; margin-bottom: 6px; padding: 0; }
+.fb-kind { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fb-opt { display: flex; gap: 10px; align-items: flex-start; border: 2px solid var(--line); border-radius: var(--radius); padding: 12px 14px; cursor: pointer; background: var(--paper); transition: border-color .15s; }
+.fb-opt.on { border-color: var(--accent); }
+.fb-opt input { margin-top: 5px; accent-color: var(--accent); }
+.fb-opt span { display: flex; flex-direction: column; line-height: 1.35; }
+.fb-opt small { color: var(--ink-soft); font-size: .88rem; margin-top: 2px; }
+.stars { display: inline-flex; flex-direction: row-reverse; gap: 2px; }
+.stars input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.stars label { font-size: 2.1rem; line-height: 1; color: var(--line); cursor: pointer; padding: 0 2px; transition: color .1s, transform .1s; }
+.stars label:hover, .stars label:hover ~ label, .stars input:checked ~ label { color: var(--brass); }
+.stars input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.stars label:active { transform: scale(.9); }
+.fb-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fb-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; font-weight: 600; }
+.fb-field small { font-weight: 400; color: var(--ink-soft); }
+.fb-field input, .fb-field textarea { font: inherit; font-weight: 400; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+.fb-field textarea { resize: vertical; min-height: 120px; }
+.fb-field input:focus, .fb-field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.fb-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.fb-note { font-size: .9rem; color: var(--ink-soft); margin: 0 0 14px; }
+.fb-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.fb-actions .btn[disabled] { opacity: .6; cursor: wait; }
+.fb-status { margin: 0; font-size: .95rem; }
+.fb-status.good { color: var(--good); }
+.fb-status.bad { color: var(--bad); }
+.fb-reviews { margin-bottom: 30px; }
+.fb-summary { color: var(--ink-soft); }
+.fb-avg, .fb-stars-s { color: var(--brass); letter-spacing: 1px; }
+.fb-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.fb-card { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.fb-card-top { display: flex; justify-content: space-between; align-items: center; font-size: .9rem; }
+.fb-date { color: var(--ink-soft); }
+.fb-card blockquote { margin: 0; font-size: .98rem; overflow-wrap: anywhere; }
+.fb-card figcaption { font-weight: 600; font-size: .92rem; color: var(--ink-soft); }
+.fb-card figcaption::before { content: "\2014\00a0"; }
+@media (max-width: 640px) {
+  .fb { padding: 18px 16px 20px; }
+  .fb-kind, .fb-row { grid-template-columns: 1fr; }
+}
+
+/* ---------- Private admin inbox ---------- */
+.adm { padding-top: 28px; padding-bottom: 40px; }
+.adm-login { max-width: 360px; }
+.adm-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.adm-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.adm-tabs button, .adm-btns button { font: inherit; font-size: .92rem; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.adm-tabs button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.adm-count { color: var(--ink-soft); font-size: .92rem; }
+.adm-list { display: flex; flex-direction: column; gap: 12px; }
+.adm-item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.adm-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: .88rem; }
+.adm-tag { font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.adm-tag.rv { background: var(--tag-w-bg); color: var(--tag-w-ink); }
+.adm-tag.pv { background: var(--info-bg); color: var(--ink); }
+.adm-st { text-transform: capitalize; color: var(--ink-soft); }
+.adm-st.st-new { color: var(--bad); font-weight: 700; }
+.adm-st.st-approved { color: var(--good); font-weight: 700; }
+.adm-date { margin-left: auto; color: var(--ink-soft); }
+.adm-msg { margin: 10px 0 6px; overflow-wrap: anywhere; }
+.adm-who { margin: 0 0 10px; font-size: .9rem; color: var(--ink-soft); }
+.adm-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.adm-btns button.ok { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.adm-btns button.del { color: var(--bad); }
+.adm-item.confirm .del { background: var(--bad); color: #fff; border-color: var(--bad); }
+.adm-empty { color: var(--ink-soft); }

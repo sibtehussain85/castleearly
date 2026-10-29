@@ -43,5 +43,6 @@ Every opening line and puzzle on the site is checked move by move with a chess e
 
 ## About
 - [About CastleEarly](https://castleearly.com/about/): CastleEarly is a free chess opening trainer for beginners, with interactive boards and plain-English explanations.
+- [Feedback and Reviews](https://castleearly.com/feedback/): Rate CastleEarly and read reviews from other players, or send private feedback to suggest an opening, report a mistake or share an idea.
 - [Contact CastleEarly](https://castleearly.com/contact/): Contact CastleEarly to report a mistake in a lesson, suggest a chess opening you'd like covered, or ask a question about the site.
 - [Terms of Use](https://castleearly.com/terms/): The terms for using CastleEarly: free chess games, lessons and game analysis for personal learning, fair play, licenses, no warranty and how to contact us.
