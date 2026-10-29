@@ -1,0 +1,47 @@
+# CastleEarly
+
+> CastleEarly (castleearly.com) is a free chess website for beginners and improving players. Visitors can play chess in the browser against the computer (Easy, Medium, Hard, or Master powered by Stockfish 19 lite) or a friend, analyze their Chess.com and Lichess games free with Stockfish, and learn the rules, 18 openings, 28 tactics and the basic endgames on interactive boards. No sign-up is needed.
+
+Every opening line and puzzle on the site is checked move by move with a chess engine. Lessons are written in plain English by Hussain, the site's author. CastleEarly is independent and not affiliated with Chess.com or Lichess.
+
+## Tools
+- [Play Chess Online Free vs Computer or a Friend](https://castleearly.com/): Play chess free against the computer (Easy to Master/Stockfish) or a friend, then get free Stockfish analysis of every move. No sign-up, no download.
+- [Free Chess Game Analysis for Chess.com & Lichess](https://castleearly.com/analysis/): Analyze your Chess.com or Lichess games free with Stockfish: accuracy, blunders, best moves and an advantage graph. Just type your username. No sign-up.
+
+## Learn the rules
+- [How to Play Chess: Rules for Beginners](https://castleearly.com/learn/): Learn how to play chess step by step: the goal, the board, how each piece moves, check, checkmate, stalemate and draws. Free interactive boards for beginners.
+- [How to Set Up a Chess Board (Easy Tricks)](https://castleearly.com/learn/chess-board-setup/): How to set up a chess board correctly: which way the board goes, where each piece goes, and easy tricks to remember the king and queen squares.
+- [How Chess Pieces Move (with Piece Values)](https://castleearly.com/learn/how-chess-pieces-move/): How each chess piece moves, explained simply with an interactive board for each one: king, queen, rook, bishop, knight and pawn, plus what each piece is worth.
+- [Castling, En Passant and Promotion Explained](https://castleearly.com/learn/special-moves/): Learn the three special moves in chess: castling, en passant and pawn promotion. Simple rules, common questions and an interactive board for each.
+- [Chess Notation Explained: Read and Write Moves](https://castleearly.com/learn/chess-notation/): Chess notation explained simply: square names, piece letters, captures, check, checkmate, castling and promotion, with an interactive example game.
+
+## Openings
+- [Chess Openings for Beginners: White and Black](https://castleearly.com/openings/): A library of 18 chess openings for White and defenses for Black, each with an interactive board, plans, traps and a practice mode.
+- [The Best Chess Openings for Beginners](https://castleearly.com/openings/best-chess-openings-for-beginners/): Which chess openings should beginners learn first? The best simple, reliable openings for White and Black, why they work, and how to choose.
+- [Caro-Kann Defense: Moves and Plans for Beginners](https://castleearly.com/openings/caro-kann-defense/): Learn the Caro-Kann Defense (1.e4 c6 2.d4 d5) move by move: the Classical and Advance variations, Black's plans, common mistakes and a free practice board.
+- [English Opening: Moves and Plans for Beginners](https://castleearly.com/openings/english-opening/): Learn the English Opening (1.c4) move by move: the Reversed Sicilian and Symmetrical lines, plans for White, common mistakes and a free practice board.
+- [Four Knights Game: Moves and Plans for Beginners](https://castleearly.com/openings/four-knights-game/): Learn the Four Knights Game (1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6) move by move: the Spanish and Scotch versions, plans, common mistakes and a free practice board.
+- [French Defense: Moves and Plans for Beginners](https://castleearly.com/openings/french-defense/): Learn the French Defense (1.e4 e6 2.d4 d5) move by move: the Advance and Classical variations, Black's plans, common mistakes and a free practice board.
+- [Fried Liver Attack: Moves, Traps and Defense](https://castleearly.com/openings/fried-liver-attack/): Learn the Fried Liver Attack (4.Ng5 and 6.Nxf7) move by move: the knight sacrifice, Black's correct 5...Na5 defense, the Traxler and a free practice board.
+- [Italian Game: Moves, Plans and Traps](https://castleearly.com/openings/italian-game/): Learn the Italian Game chess opening (1.e4 e5 2.Nf3 Nc6 3.Bc4) move by move. Main ideas, plans for White and Black, common traps, and a board to practice on.
+- [King's Indian Defense: Beginner's Guide](https://castleearly.com/openings/kings-indian-defense/): Learn the King's Indian Defense (1.d4 Nf6 2.c4 g6) move by move: the Classical main line, a setup against the London, Black's plans and a practice board.
+- [London System: Setup and Plans for Beginners](https://castleearly.com/openings/london-system/): Learn the London System chess opening (1.d4 and 2.Bf4) step by step. The setup, the plans, how to handle ...Qb6 and ...Bd6, and a free board to practice on.
+- [Nimzo-Indian Defense: Beginner's Guide](https://castleearly.com/openings/nimzo-indian-defense/): Learn the Nimzo-Indian Defense (1.d4 Nf6 2.c4 e6 3.Nc3 Bb4) move by move: the Rubinstein and Classical lines, Black's plans and a free practice board.
+- [Petrov Defense: Moves, Plans and the Key Trap](https://castleearly.com/openings/petrov-defense/): Learn the Petrov Defense (1.e4 e5 2.Nf3 Nf6) move by move: the main line, the trap every Black player must avoid, common mistakes and a free practice board.
+- [Queen's Gambit: Moves and Plans for Beginners](https://castleearly.com/openings/queens-gambit/): Learn the Queen's Gambit (1.d4 d5 2.c4) move by move: the Declined and Accepted lines, plans for White, common mistakes and a free practice board.
+- [Queen's Gambit Declined: Beginner's Guide](https://castleearly.com/openings/queens-gambit-declined/): Learn the Queen's Gambit Declined (1.d4 d5 2.c4 e6) move by move: the Tartakower setup, the Elephant Trap, Black's plans and a free practice board.
+- [Ruy Lopez: Moves, Plans and Traps](https://castleearly.com/openings/ruy-lopez/): Learn the Ruy Lopez (1.e4 e5 2.Nf3 Nc6 3.Bb5) move by move: the Closed main line, plans for both sides, the Noah's Ark trap and a free practice board.
+- [Scandinavian Defense: Beginner's Guide](https://castleearly.com/openings/scandinavian-defense/): Learn the Scandinavian Defense (1.e4 d5) move by move: the ...Qa5 and ...Qd6 lines, Black's plans, common mistakes and a free practice board.
+- [Scotch Game: Moves and Plans for Beginners](https://castleearly.com/openings/scotch-game/): Learn the Scotch Game (1.e4 e5 2.Nf3 Nc6 3.d4) move by move: the main lines, plans for both sides, a classic beginner mistake, and a free practice board.
+- [Sicilian Defense: Moves and Plans for Beginners](https://castleearly.com/openings/sicilian-defense/): Learn the Sicilian Defense (1.e4 c5) move by move: the Najdorf main line, how to face the Alapin, plans for both sides and a free practice board.
+- [Slav Defense: Moves and Plans for Beginners](https://castleearly.com/openings/slav-defense/): Learn the Slav Defense (1.d4 d5 2.c4 c6) move by move: the main line, the Exchange Slav, Black's plans, common mistakes and a free practice board.
+- [Vienna Game: Moves and Plans for Beginners](https://castleearly.com/openings/vienna-game/): Learn the Vienna Game (1.e4 e5 2.Nc3) and the Vienna Gambit move by move, with plans for both sides, common mistakes and a free practice board.
+
+## Tactics and endgames
+- [Chess Tactics: 28 Patterns with Puzzles](https://castleearly.com/tactics/): Learn 28 chess tactics with free interactive puzzles: forks, pins, skewers, deflection, interference, windmill, Greek gift, zugzwang and more.
+- [Basic Chess Endgames: Practice Checkmates](https://castleearly.com/endgames/): Learn the basic chess checkmates with king and queen, king and rook, two rooks and king and pawn. Practice each one against the computer for free.
+
+## About
+- [About CastleEarly](https://castleearly.com/about/): CastleEarly is a free chess opening trainer for beginners, with interactive boards and plain-English explanations.
+- [Contact CastleEarly](https://castleearly.com/contact/): Contact CastleEarly to report a mistake in a lesson, suggest a chess opening you'd like covered, or ask a question about the site.
+- [Terms of Use](https://castleearly.com/terms/): The terms for using CastleEarly: free chess games, lessons and game analysis for personal learning, fair play, licenses, no warranty and how to contact us.
