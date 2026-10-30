@@ -2,24 +2,46 @@
 (function () {
   var btn = document.querySelector(".menu-btn"), nav = document.getElementById("site-nav");
   if (btn && nav) {
-    btn.addEventListener("click", function () {
-      var open = nav.classList.toggle("open");
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      document.documentElement.classList.toggle("menu-open", open); // lock the page so swipes scroll the menu
-    });
-    // Close the menu (and unlock the page) when a link in it is tapped or the screen gets wide.
+    /* Lock the page by pinning <body> where it is (not overflow:hidden, which breaks the sticky
+       header and sends the open menu off-screen when you're scrolled down). The header is pinned
+       to the top of the screen while the menu is open, then the scroll position is restored. */
+    var html = document.documentElement, body = document.body, savedY = 0;
+    function openMenu() {
+      savedY = window.scrollY || window.pageYOffset || 0;
+      body.style.position = "fixed"; body.style.top = -savedY + "px";
+      body.style.left = "0"; body.style.right = "0"; body.style.width = "100%";
+      html.classList.add("menu-open");
+      nav.classList.add("open"); btn.setAttribute("aria-expanded", "true");
+      nav.scrollTop = 0;
+    }
+    function closeMenu(jumping) {
+      if (!nav.classList.contains("open")) return;
+      nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false");
+      html.classList.remove("menu-open");
+      body.style.position = body.style.top = body.style.left = body.style.right = body.style.width = "";
+      if (!jumping) {
+        var prev = html.style.scrollBehavior; html.style.scrollBehavior = "auto";
+        window.scrollTo(0, savedY);
+        html.style.scrollBehavior = prev;
+      }
+    }
+    btn.addEventListener("click", function () { nav.classList.contains("open") ? closeMenu() : openMenu(); });
+    // Tapping a link: unlock first so same-page links like /openings/#traps jump to the right place.
     nav.addEventListener("click", function (e) {
-      if (e.target.closest("a") && nav.classList.contains("open")) {
-        nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false");
-        document.documentElement.classList.remove("menu-open");
-      }
+      var a = e.target.closest("a");
+      if (a && nav.classList.contains("open")) closeMenu(a.hash && a.pathname === location.pathname);
     });
-    window.addEventListener("resize", function () {
-      if (window.innerWidth > 760 && nav.classList.contains("open")) {
-        nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false");
-        document.documentElement.classList.remove("menu-open");
+    // Tap outside the menu, press Escape, or widen the screen → close.
+    // (Capture phase + preventDefault so that tap only closes the menu and never opens a link underneath.)
+    document.addEventListener("click", function (e) {
+      if (nav.classList.contains("open") && !e.target.closest(".site-header")) {
+        e.preventDefault(); e.stopPropagation(); closeMenu();
       }
-    });
+    }, true);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
+    window.addEventListener("resize", function () { if (window.innerWidth > 760) closeMenu(); });
+    // Coming back with the browser's Back button must never leave the page locked.
+    window.addEventListener("pageshow", function () { closeMenu(); });
   }
   var root = document.documentElement;
   var meta = document.querySelector('meta[name="theme-color"]');
