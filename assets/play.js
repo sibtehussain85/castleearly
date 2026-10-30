@@ -44,7 +44,8 @@
 
   // Where engine.js lives (same folder as this script) \u2014 used for the background worker
   var scriptSrc = (document.currentScript && document.currentScript.src) || "";
-  var ENGINE_URL = scriptSrc.replace(/play\.js(\?.*)?$/, "engine.js");
+  var VER = (scriptSrc.match(/\?.*$/) || [""])[0]; // site version, so updates reach browsers at once
+  var ENGINE_URL = scriptSrc.replace(/play\.js(\?.*)?$/, "engine.js") + VER;
 
   /* ---------- Sounds: shared "Soft tok" set from sound.js ---------- */
   var NOOP = function () {};
@@ -687,7 +688,7 @@
   };
 
   /* ---------- Game review (review.js is only downloaded when someone asks for a review) ---------- */
-  var REVIEW_URL = scriptSrc.replace(/play\.js(\?.*)?$/, "review.js"), reviewLoading = null;
+  var REVIEW_URL = scriptSrc.replace(/play\.js(\?.*)?$/, "review.js") + VER, reviewLoading = null;
   Board.prototype.openReview = function () {
     var self = this;
     if (this.review || this.game.stack.length < 1) return;

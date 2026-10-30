@@ -27,7 +27,7 @@
   "use strict";
   var btn = document.querySelector(".search-btn");
   if (!btn) return;
-  var me = document.currentScript || document.querySelector('script[src$="site.js"]');
+  var me = document.currentScript || document.querySelector('script[src*="site.js"]');
   var src = (me && me.src) || "";
   var BASE = src.replace(/assets\/site\.js(\?.*)?$/, "");
   var logo = document.querySelector(".logo");
@@ -163,7 +163,7 @@
     if (data || loading) return;
     loading = true;
     var s = document.createElement("script");
-    s.src = BASE + "assets/search-index.js";
+    s.src = BASE + "assets/search-index.js" + ((me && me.src && (me.src.match(/\?.*$/) || [""])[0]) || "");
     s.onload = function () { data = window.CE_SEARCH || []; prep(); render(); };
     s.onerror = function () { loading = false; list.innerHTML = '<p class="srch-empty">Search couldn\u2019t load. Check your connection and try again.</p>'; };
     document.head.appendChild(s);
