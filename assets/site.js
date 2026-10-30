@@ -5,6 +5,20 @@
     btn.addEventListener("click", function () {
       var open = nav.classList.toggle("open");
       btn.setAttribute("aria-expanded", open ? "true" : "false");
+      document.documentElement.classList.toggle("menu-open", open); // lock the page so swipes scroll the menu
+    });
+    // Close the menu (and unlock the page) when a link in it is tapped or the screen gets wide.
+    nav.addEventListener("click", function (e) {
+      if (e.target.closest("a") && nav.classList.contains("open")) {
+        nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false");
+        document.documentElement.classList.remove("menu-open");
+      }
+    });
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 760 && nav.classList.contains("open")) {
+        nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false");
+        document.documentElement.classList.remove("menu-open");
+      }
     });
   }
   var root = document.documentElement;
