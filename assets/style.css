@@ -321,7 +321,8 @@ h3 { font-size: 1.2rem; margin: 1.6em 0 0.4em; }
   .site-header .wrap { flex-wrap: wrap; }
   .menu-btn { display: block; }
   .nav { display: none; width: 100%; flex-direction: column; align-items: stretch; gap: 0; padding: 4px 0 12px; }
-  .nav.open { display: flex; max-height: calc(100vh - 70px); max-height: calc(100dvh - 70px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .nav.open { display: flex; flex-wrap: nowrap; max-height: calc(100vh - 70px); max-height: calc(100dvh - 70px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .nav.open > * { flex-shrink: 0; }
   html.menu-open, html.menu-open body { overflow: hidden; }
   .nav > a, .nav-dd > a { display: block; padding: 12px 4px; border-top: 1px solid var(--line); font-size: 1rem; }
   .nav-dd .dd { position: static; display: flex; border: 0; box-shadow: none; padding: 0 0 6px 12px; min-width: 0; }
