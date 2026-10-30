@@ -311,6 +311,7 @@ h3 { font-size: 1.2rem; margin: 1.6em 0 0.4em; }
   display: none; flex-direction: column; z-index: 50;
 }
 .nav-dd:hover .dd, .nav-dd:focus-within .dd { display: flex; }
+.nav > .nav-dd:last-child .dd { left: auto; right: -12px; } /* About menu opens toward the left */
 .nav-dd .dd a { padding: 9px 12px; border-radius: 8px; color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.95rem; }
 .nav-dd .dd a:hover { background: var(--paper-2); color: var(--accent); }
 .menu-btn { display: none; width: 42px; height: 42px; border: 0; background: transparent; cursor: pointer; padding: 10px; border-radius: 8px; }
@@ -326,6 +327,7 @@ h3 { font-size: 1.2rem; margin: 1.6em 0 0.4em; }
   html.menu-open, html.menu-open body { overflow: hidden; }
   .nav > a, .nav-dd > a { display: block; padding: 12px 4px; border-top: 1px solid var(--line); font-size: 1rem; }
   .nav-dd .dd { position: static; display: flex; border: 0; box-shadow: none; padding: 0 0 6px 12px; min-width: 0; }
+  .nav > .nav-dd:last-child .dd { right: auto; }
   .nav-dd .caret { display: none; }
 }
 
