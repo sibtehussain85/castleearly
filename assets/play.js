@@ -512,6 +512,9 @@
     }
     if (!undone) return;
     (this.redoStack = this.redoStack || []).push(group); // Redo puts these moves back
+    // Slide the pieces back to where they came from, and play a soft "back" sound.
+    if (!REDUCED) this.anim = { pairs: group.map(function (g) { return [sq(g.to), sq(g.from)]; }), t0: performance.now() };
+    SFX.undo && SFX.undo();
     this.over = null; this.hideOverlay();
     var h = this.game.stack;
     this.lastMove = h.length ? [h[h.length - 1].m.from, h[h.length - 1].m.to] : null;
@@ -533,11 +536,12 @@
     }
     if (last) this.lastMove = [sq(last.from), sq(last.to)];
     this.selected = -1; this.hintSq = -1;
+    if (!REDUCED) this.anim = { pairs: group.map(function (g) { return [sq(g.from), sq(g.to)]; }), t0: performance.now() };
     var stt = this.game.status();
     if (stt.over) this.finish(stt);
     else if (this.game.inCheck()) SFX.check();
     else if (res && res.captured) SFX.capture();
-    else SFX.move();
+    else if (SFX.redo) SFX.redo(); else SFX.move();
     this.render(); this.save();
     if (!stt.over) this.maybeComputerMove();
   };

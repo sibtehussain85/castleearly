@@ -65,6 +65,8 @@
     win: safe(function () { [523, 659, 784, 1046].forEach(function (f, i) { bell(f, 0.14, i * 0.12, 0.8); }); }),
     lose: safe(function () { [392, 330, 262].forEach(function (f, i) { bell(f, 0.12, i * 0.16, 0.8); }); }),
     wrong: safe(function () { hit(0, 0.8, 0.55); }),
+    undo: safe(function () { hit(0, 0.75, 0.84); hit(0.07, 0.55, 0.74); }), // soft "sliding back"
+    redo: safe(function () { hit(0, 0.6, 0.96); hit(0.07, 0.75, 1.08); }), // soft "sliding forward"
     start: safe(function () { hit(0, 0.6, 1.1); hit(0.08, 0.6, 0.95); hit(0.15, 0.6, 1.05); }),
     isOn: function () { return on; },
     setOn: function (v) { on = !!v; try { localStorage.setItem("ce-sound", on ? "on" : "off"); } catch (e) {} }
