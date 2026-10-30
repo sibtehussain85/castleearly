@@ -101,11 +101,22 @@
   /* ---------- Scores ---------- */
   function isMate(s) { return Math.abs(s) > MATE - 200; }
   function mateIn(s) { return Math.ceil((MATE - Math.abs(s)) / 2); }
+  // Winning chances (0-100) from a centipawn score, as published by Lichess.
   function winPct(s) {
     if (isMate(s)) return s > 0 ? 100 : 0;
-    var cp = Math.max(-1500, Math.min(1500, s));
+    var cp = Math.max(-1000, Math.min(1000, s));
     return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
   }
+  // A gentler curve that keeps counting when one side is already far ahead, so throwing away
+  // even more material in a lost position still shows up (Chess.com punishes that too).
+  function winPctWide(s) {
+    if (isMate(s)) return s > 0 ? 100 : 0;
+    var cp = Math.max(-3000, Math.min(3000, s));
+    return 50 + 50 * (2 / (1 + Math.exp(-0.0012 * cp)) - 1);
+  }
+  function capCp(s) { return isMate(s) ? (s > 0 ? 2000 : -2000) : Math.max(-2000, Math.min(2000, s)); }
+  // Accuracy from average centipawn loss (a widely used fit to Chess.com's numbers)
+  function acplAccuracy(x) { return Math.max(0, Math.min(100, 103.3979 - 0.3820659 * x - 0.002169231 * x * x)); }
   function moveAccuracy(drop) { return Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * drop) - 3.1669)); }
   function fmtEval(w) { // w: score from White's point of view
     if (isMate(w)) { var n = mateIn(w); return n === 0 ? (w > 0 ? "1-0" : "0-1") : (w > 0 ? "M" : "-M") + n; }
@@ -261,7 +272,10 @@
       var mover = fen.split(" ")[1];
       var best = a.score, played = a.playedScore == null ? a.score : a.playedScore;
       var wpBest = winPct(best), wpPlayed = winPct(played);
-      var drop = Math.max(0, wpBest - wpPlayed);
+      var dropNarrow = Math.max(0, wpBest - wpPlayed);
+      var dropWide = Math.max(0, winPctWide(best) - winPctWide(played));
+      var drop = Math.max(dropNarrow, dropWide);
+      var cpLoss = Math.max(0, capCp(best) - capCp(played));
       var isBest = uci === a.best || played >= best - 5;
       var cls = null;
       if (a.n === 1) cls = "forced";
@@ -274,9 +288,10 @@
       if (!cls) cls = drop < 2 ? "excellent" : drop < 5 ? "good" : drop < 10 ? "inaccuracy" : drop < 20 ? "mistake" : "blunder";
       if (cls !== "book" && cls !== "forced") stillBook = false;
       if (cls === "excellent" && drop < 0.5) cls = "best";
-      var acc = cls === "book" || cls === "forced" ? 100 : moveAccuracy(drop);
+      var acc = cls === "book" || cls === "forced" ? 100 : moveAccuracy(Math.max(dropNarrow, dropWide * 1.5) * 1.5);
       if (cls === "mistake" && isMate(best)) acc = Math.min(acc, 60);
-      out.push({ cls: cls, color: mover, drop: drop, acc: acc, best: a.best, bestScore: best, playedScore: played });
+      if (cls === "book" || cls === "forced") cpLoss = 0;
+      out.push({ cls: cls, color: mover, drop: drop, acc: acc, cpLoss: cpLoss, ply: i, best: a.best, bestScore: best, playedScore: played });
     }
     return out;
   }
@@ -295,13 +310,34 @@
   }
 
   function summary(rv) {
-    var s = { w: { acc: 0, n: 0, counts: {} }, b: { acc: 0, n: 0, counts: {} } };
-    rv.cls.forEach(function (c) {
+    // Game accuracy for each side = average of two measures:
+    //  1. Lichess method: each move's accuracy from lost winning chances, combined as the mean of a
+    //     volatility-weighted average (sharp moments count more) and a harmonic mean (blunders hurt a lot)
+    //  2. Accuracy from the average centipawn loss
+    var s = { w: { acc: 0, n: 0, counts: {}, list: [], cpl: 0 }, b: { acc: 0, n: 0, counts: {}, list: [], cpl: 0 } };
+    var evs = rv.evals || whiteEvals(rv), wps = evs.map(winPct), nMoves = rv.cls.length;
+    var win = Math.max(2, Math.min(8, Math.floor(nMoves / 10)));
+    function weight(i) {
+      var from = Math.max(0, i - win + 2), seg = wps.slice(from, i + 2), m = 0, v = 0;
+      if (seg.length < 2) return 0.5;
+      seg.forEach(function (x) { m += x; }); m /= seg.length;
+      seg.forEach(function (x) { v += (x - m) * (x - m); });
+      return Math.max(0.5, Math.min(12, Math.sqrt(v / seg.length)));
+    }
+    rv.cls.forEach(function (c, i) {
       var side = s[c.color];
       side.counts[c.cls] = (side.counts[c.cls] || 0) + 1;
-      if (c.cls !== "forced") { side.acc += c.acc; side.n++; }
+      if (c.cls !== "forced") { side.list.push({ acc: c.acc, w: weight(i) }); side.cpl += c.cpLoss || 0; side.n++; }
     });
-    ["w", "b"].forEach(function (k) { s[k].acc = s[k].n ? s[k].acc / s[k].n : null; });
+    ["w", "b"].forEach(function (k) {
+      var sd = s[k];
+      if (!sd.n) { sd.acc = null; return; }
+      var ws = 0, wsum = 0, inv = 0;
+      sd.list.forEach(function (m) { ws += m.acc * m.w; wsum += m.w; inv += 1 / Math.max(m.acc, 1); });
+      var lichess = (ws / wsum + sd.n / inv) / 2;
+      sd.acpl = sd.cpl / sd.n;
+      sd.acc = (lichess + acplAccuracy(sd.acpl)) / 2;
+    });
     // Opening name: the deepest named book position of the game
     var op = null;
     for (var i = 1; i <= rv.moves.length && i <= 30; i++) { var o = openingAfter(rv.fens[i]); if (o) op = o; }
