@@ -1,5 +1,6 @@
 # CastleEarly welcomes search engines and AI assistants.
 User-agent: *
+Disallow: /cdn-cgi/
 Allow: /
 Disallow: /admin/
 Disallow: /api/
