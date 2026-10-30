@@ -260,7 +260,7 @@
       ? [["retry", "\u21ba Reset"], ["flip", "\u21c5 Flip"], ["sound", ""]]
       : this.kind === "puzzle"
       ? [["retry", "\u21ba Retry"], ["hint", "\ud83d\udca1 Hint"], ["flip", "\u21c5 Flip"], ["sound", ""]]
-      : [["new", "\uff0b New game"], ["undo", "\u21b6 Undo"], ["hint", "\ud83d\udca1 Hint"], ["review", "\ud83d\udcc8 Analyze"], ["flip", "\u21c5 Flip"], ["sound", ""]];
+      : [["new", "\uff0b New game"], ["undo", "\u21b6 Undo"], ["redo", "\u21b7 Redo"], ["hint", "\ud83d\udca1 Hint"], ["review", "\ud83d\udcc8 Analyze"], ["flip", "\u21c5 Flip"], ["sound", ""]];
     if (this.kind !== "sandbox") buttons.push(["fs", "\u26f6 Full screen"]);
     buttons.forEach(function (b) {
       var btn = el("button", "pb-btn", b[1]);
@@ -276,6 +276,7 @@
       if (a === "new") self.newGame();
       if (a === "retry") self.newGame();
       if (a === "undo") self.undo();
+      if (a === "redo") self.redo();
       if (a === "flip") { self.flipped = !self.flipped; self.render(); }
       if (a === "hint") self.hint();
       if (a === "review") self.openReview();
@@ -376,6 +377,7 @@
   Board.prototype.newGame = function (silent) {
     if (this.review && this.endReview) this.endReview(true);
     this.game = new Chess(this.startFen);
+    this.redoStack = [];
     this.over = null; this.selected = -1; this.thinking = false; this.lastMove = null;
     this.puzzleStep = 0; this.hintSq = -1; this.mistakes = 0;
     this.token = (this.token || 0) + 1;
@@ -451,6 +453,7 @@
   Board.prototype.applyMove = function (from, to, promo, byComputer) {
     var res = this.game.move({ from: from, to: to, promotion: promo || "q" });
     if (!res) return false;
+    this.redoStack = []; // a new move replaces whatever Undo took back
     this.lastMove = [sq(from), sq(to)];
     this.selected = -1; this.hintSq = -1;
     if (!this.skipAnim && !REDUCED) {
@@ -501,15 +504,42 @@
     this.token++;
     this.thinking = false;
     var n = this.isComputerGame() ? (this.game.turn === this.myColor ? 2 : 1) : 1;
-    var undone = false;
-    for (var i = 0; i < n; i++) if (this.game.undo()) undone = true;
+    var undone = false, group = [];
+    for (var i = 0; i < n; i++) {
+      var st = this.game.stack, top = st.length ? st[st.length - 1].m : null;
+      var u = this.game.undo();
+      if (u) { undone = true; group.unshift({ from: u.from, to: u.to, promo: top && top.promotion ? String(top.promotion).toLowerCase() : "" }); }
+    }
     if (!undone) return;
+    (this.redoStack = this.redoStack || []).push(group); // Redo puts these moves back
     this.over = null; this.hideOverlay();
     var h = this.game.stack;
     this.lastMove = h.length ? [h[h.length - 1].m.from, h[h.length - 1].m.to] : null;
     this.selected = -1; this.hintSq = -1;
     this.render(); this.save();
     this.maybeComputerMove();
+  };
+
+  // Redo: replay the moves the last Undo took back (like the forward arrow after a takeback).
+  Board.prototype.redo = function () {
+    if (this.kind === "puzzle" || this.review || !this.redoStack || !this.redoStack.length) return;
+    this.token++;
+    this.thinking = false;
+    var group = this.redoStack.pop(), res = null, last = null;
+    for (var i = 0; i < group.length; i++) {
+      res = this.game.move({ from: group[i].from, to: group[i].to, promotion: group[i].promo || "q" });
+      if (!res) break;
+      last = group[i];
+    }
+    if (last) this.lastMove = [sq(last.from), sq(last.to)];
+    this.selected = -1; this.hintSq = -1;
+    var stt = this.game.status();
+    if (stt.over) this.finish(stt);
+    else if (this.game.inCheck()) SFX.check();
+    else if (res && res.captured) SFX.capture();
+    else SFX.move();
+    this.render(); this.save();
+    if (!stt.over) this.maybeComputerMove();
   };
 
   Board.prototype.hint = function () {
@@ -939,6 +969,8 @@
     }
     var undoBtn = this.root.querySelector('[data-act="undo"]');
     if (undoBtn) undoBtn.disabled = g.stack.length === 0;
+    var redoBtn = this.root.querySelector('[data-act="redo"]');
+    if (redoBtn) redoBtn.disabled = !this.redoStack || !this.redoStack.length;
     var revBtn = this.root.querySelector('[data-act="review"]');
     if (revBtn) revBtn.disabled = g.stack.length < 2 || this.thinking;
     if (this.review && this.reviewPaint) this.reviewPaint();

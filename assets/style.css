@@ -840,6 +840,20 @@ html.pb-fs-lock .site-header, html.pb-fs-lock .read-progress { visibility: hidde
   /* phones: shorter labels so one row of buttons fits */
   .pb.pb-fs [data-act="review"], .pb.pb-fs [data-act="sound"] { display: none; }
 }
+/* Phones held upright in full screen: an app-like layout with no empty bands.
+   Board at the top, the move list fills the middle, buttons sit in a bottom bar. */
+@media (orientation: portrait) {
+  .pb.pb-fs { justify-content: flex-start; align-items: stretch;
+    --fs: min(calc(100vw - 20px), calc(100vh - 330px));
+    --fs: min(calc(100vw - 20px), calc(100dvh - 330px)); }
+  .pb.pb-fs .pb-main { display: flex; flex-direction: column; align-items: center; flex: 1 1 auto; min-height: 0; width: 100%; gap: 6px; }
+  .pb.pb-fs .pb-side { width: var(--fs); flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+  .pb.pb-fs .pb-status { min-height: 0; padding: 7px 12px; }
+  .pb.pb-fs .pb-moves { display: grid; flex: 1 1 auto; height: auto; min-height: 44px; max-height: none; padding: 6px 10px; }
+  .pb.pb-fs .pb-tools { margin-top: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .pb.pb-fs .pb-btn { padding: 11px 4px; font-size: .9rem; }
+  .pb.pb-fs [data-act="review"], .pb.pb-fs [data-act="sound"] { display: none; }
+}
 @media (orientation: landscape) and (min-width: 700px) {
   .pb.pb-fs {
     --fs: min(calc(100vh - 120px), calc(100vw - 400px));
