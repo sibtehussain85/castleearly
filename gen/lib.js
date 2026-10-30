@@ -5,7 +5,12 @@ const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
 const boardFen = fen => fen.split(' ')[0];
 
 // Position after a SAN line, plus last-move squares.
+// A line is "e4 e5 ..." from the start, or "FEN|moves" from a custom position.
+function split(lineStr) { const i = lineStr.indexOf('|'); return i < 0 ? [undefined, lineStr] : [lineStr.slice(0, i).trim(), lineStr.slice(i + 1).trim()]; }
 function pos(lineStr) {
+  const [sf0, mv0] = split(lineStr);
+  if (sf0 && !mv0) return { fen: sf0, hl: '' };
+  if (sf0) { const { steps } = line(mv0, sf0); const l = steps[steps.length - 1]; return { fen: l.fen, hl: l.from + ',' + l.to, steps }; }
   if (!lineStr.trim()) return { fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', hl: '' };
   const { steps } = line(lineStr);
   const l = steps[steps.length - 1];
@@ -34,9 +39,10 @@ function quickCheck(q, options, answerIdx, why) {
 
 // Step-through trainer. notes: one note per move.
 function trainer({ title, orientation, practiceSide, intro, moves, notes }) {
-  const { steps } = line(moves);
+  const [f0, m0] = split(moves);
+  const { steps } = line(m0, f0);
   if (notes.length !== steps.length) throw new Error(`Trainer "${title}": ${steps.length} moves but ${notes.length} notes`);
-  const data = { title, orientation, practiceSide, intro, moves: steps.map((s, i) => ({ uci: s.uci, san: s.san, note: notes[i] })) };
+  const data = { title, orientation, practiceSide, intro, ...(f0 ? { fen: f0.split(' ')[0], black: f0.split(' ')[1] === 'b' } : {}), moves: steps.map((s, i) => ({ uci: s.uci, san: s.san, note: notes[i] })) };
   return `<div class="trainer">\n<script type="application/json">\n${JSON.stringify(data, null, 1)}</script>\n</div>`;
 }
 
@@ -59,4 +65,4 @@ function card({ href, line: l, flip, tag, tagCls, title, text }) {
 
 const strip = h => h.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
 
-module.exports = { esc, boardFen, pos, mv, story, quickCheck, trainer, ideas, keyFacts, faqHtml, card, strip };
+module.exports = { split, esc, boardFen, pos, mv, story, quickCheck, trainer, ideas, keyFacts, faqHtml, card, strip };

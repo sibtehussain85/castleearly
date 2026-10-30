@@ -7,3 +7,5 @@ This branch holds the generators Claude uses to add lessons. The live site is th
 - `gen/wire.js` – adds pages to the library, menu, related lessons, sitemap, search index, llms.txt
 - `gen/og.py` + `gen/sprites/` – share images
 - Paths assume the site is cloned at /home/claude/castleearly and these files at /home/claude/gen.
+- `gen/pages2.js` + `gen/wire2.js` – Learn-section pages (Stalemate, Zugzwang); lines can be "FEN|moves"
+- Learn pages: set `sec: 'learn'`; quizzes may set `ask` (custom question)

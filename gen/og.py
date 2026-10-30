@@ -71,7 +71,7 @@ def make(job):
     y = 262 if len(lines) == 2 else 248
     for ln in lines:
         d.text((62, y), ln, font=F_TITLE, fill=(255, 255, 253)); y += 60
-    im.save(f"{SITE}/assets/og/openings-{job['slug']}.jpg", quality=88, optimize=True, progressive=True)
+    im.save(f"{SITE}/assets/og/{job.get('out', 'openings-' + job['slug'])}.jpg", quality=88, optimize=True, progressive=True)
     print('wrote', job['slug'])
 
 for job in json.load(open(sys.argv[1])):
