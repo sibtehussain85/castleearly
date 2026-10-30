@@ -270,6 +270,17 @@
     window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     update();
   }
-  function go() { drawBoards(); spy(); reveal(); progress(); }
+  // "Learned" badges on opening cards (saved in this browser when a lesson quiz is passed)
+  function learnedBadges() {
+    var l = [];
+    try { l = JSON.parse(localStorage.getItem("ce-learned") || "[]") || []; } catch (e) {}
+    if (!l.length) return;
+    var cards = document.querySelectorAll('a.card[href^="/openings/"]');
+    for (var i = 0; i < cards.length; i++) {
+      var slug = cards[i].getAttribute("href").replace(/^\/openings\/|\/$/g, "");
+      if (l.indexOf(slug) >= 0) cards[i].classList.add("is-learned");
+    }
+  }
+  function go() { drawBoards(); spy(); reveal(); progress(); learnedBadges(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
 })();
