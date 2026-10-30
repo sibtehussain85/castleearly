@@ -274,6 +274,25 @@
   function learnedBadges() {
     var l = [];
     try { l = JSON.parse(localStorage.getItem("ce-learned") || "[]") || []; } catch (e) {}
+    if (/^\/openings\/?$/.test(location.pathname)) {
+      var all = {}, lc = document.querySelectorAll('a.card[href^="/openings/"]');
+      for (var j = 0; j < lc.length; j++) {
+        var sl = lc[j].getAttribute("href").replace(/^\/openings\/|\/$/g, "");
+        if (sl && sl.indexOf("best-") !== 0 && sl.indexOf("which-") !== 0) all[sl] = 1;
+      }
+      var total = Object.keys(all).length, got = 0;
+      for (var k in all) if (l.indexOf(k) >= 0) got++;
+      var hero = document.querySelector(".page-hero");
+      if (total && hero) {
+        var bar = document.createElement("div");
+        bar.className = "op-progress wrap-inner";
+        bar.innerHTML = got
+          ? "<span>\ud83d\udcda</span><b>You've learned " + got + " of " + total + " openings</b><span class=\"bar\"><i style=\"width:" + Math.round(got / total * 100) + "%\"></i></span>"
+          : "<span>\ud83c\udfc5</span><span><b>Track your progress.</b> Pass the \"Test yourself\" quiz at the end of a lesson to earn a \u2713 Learned badge.</span>";
+        bar.innerHTML += '<a class="op-quiz" href="/openings/which-opening-suits-you/">Not sure where to start? Take the 1-minute quiz \u2192</a>';
+        hero.parentNode.insertBefore(bar, hero.nextSibling);
+      }
+    }
     if (!l.length) return;
     var cards = document.querySelectorAll('a.card[href^="/openings/"]');
     for (var i = 0; i < cards.length; i++) {
@@ -281,6 +300,7 @@
       if (l.indexOf(slug) >= 0) cards[i].classList.add("is-learned");
     }
   }
+  window.CEDrawBoards = drawBoards;
   function go() { drawBoards(); spy(); reveal(); progress(); learnedBadges(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
 })();

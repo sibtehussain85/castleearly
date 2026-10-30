@@ -977,3 +977,43 @@ details.fold[open] { padding-bottom: 8px; }
   .has-hero .prose .idea p { font-size: .86rem; line-height: 1.4; }
   .idea p strong { font-size: .95rem; }
 }
+
+/* ====== Daily puzzle streak ====== */
+.daily-meta { font-size: .8rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--brass); margin: -.2em 0 .6em; }
+.daily-box { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin: 12px 0 14px; }
+.daily-box.pop { animation: card-pop .4s cubic-bezier(.2,.9,.3,1.3) both; }
+.daily-streak { display: flex; align-items: center; gap: 10px; font-size: 1.02rem; }
+.daily-streak .fire { font-size: 1.5rem; line-height: 1; }
+.daily-done { margin: 6px 0 0; color: var(--ink-soft); font-size: .95rem; }
+.daily-share { margin-top: 10px; padding: 9px 18px; font-size: .92rem; }
+.daily-copied { margin-left: 10px; font-size: .88rem; color: var(--good); white-space: pre-line; }
+
+/* ====== Openings progress ====== */
+.op-progress { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin: 18px 0 4px; }
+.op-progress b { font-size: 1.05rem; }
+.op-progress .bar { flex: 1 1 160px; height: 8px; border-radius: 99px; background: var(--paper-2); overflow: hidden; }
+.op-progress .bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--brass)); }
+
+/* ====== Which opening suits you? quiz ====== */
+.oq-wrap { margin: 10px 0 30px; max-width: 760px; }
+.oq-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: 0 12px 34px rgba(31,28,23,.07); }
+.oq-box .lq-top { align-items: center; }
+.oq-back { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; padding: 0; }
+.oq-text { font-family: var(--serif); font-size: clamp(1.3rem, 3vw, 1.6rem); font-weight: 700; margin: 4px 0 16px; line-height: 1.25; }
+.oq-opts { display: grid; gap: 10px; }
+.oq-opt { text-align: left; font: inherit; font-weight: 600; font-size: 1.02rem; padding: 14px 16px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--paper); color: var(--ink); cursor: pointer; transition: border-color .15s, transform .1s, background .15s; }
+.oq-opt:hover { border-color: var(--accent); transform: translateX(3px); background: var(--card); }
+.oq-h { font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--brass); margin: 0 0 12px; }
+.oq-result { display: grid; gap: 12px; }
+.oq-card { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; align-items: center; padding: 14px; border-radius: 16px; border: 1px solid var(--line);
+  background: var(--paper); text-decoration: none; color: var(--ink); transition: transform .15s, box-shadow .15s; }
+.oq-card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(31,28,23,.1); color: var(--ink); }
+.oq-card.top { border: 2px solid var(--accent); background: var(--card); }
+.oq-card h3 { margin: 2px 0 4px; font-size: 1.25rem; }
+.oq-card p { margin: 0 0 6px; color: var(--ink-soft); font-size: .95rem; line-height: 1.45; }
+.oq-label { font-size: .74rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--brass); }
+.oq-go { font-weight: 700; color: var(--accent); font-size: .92rem; }
+.oq-again { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+@media (max-width: 560px) { .oq-card { grid-template-columns: 84px minmax(0, 1fr); gap: 12px; } .oq-box { padding: 16px; } }
+.op-progress .op-quiz { font-weight: 700; font-size: .92rem; margin-left: auto; }

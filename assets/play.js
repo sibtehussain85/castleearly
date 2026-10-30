@@ -566,6 +566,7 @@
       SFX.win();
       confetti(this.boardEl);
       this.render();
+      this.announceSolved();
       return true;
     }
     this.message = { cls: "good", text: "Correct! Keep going\u2026" };
@@ -582,12 +583,18 @@
         self.message = { cls: "good", text: "<b>Solved!</b> " + (self.puzzle.explain || "") };
         SFX.win();
         confetti(self.boardEl);
+        self.announceSolved();
       } else {
         self.message = { cls: "info", text: "Your move. Find the follow-up." };
       }
       self.render();
     }, 550);
     return true;
+  };
+
+  // Lets other scripts (daily puzzle streak) know a puzzle was solved
+  Board.prototype.announceSolved = function () {
+    try { this.root.dispatchEvent(new CustomEvent("ce-solved", { bubbles: true, detail: { mistakes: this.mistakes || 0 } })); } catch (e) {}
   };
 
   /* ---------- Input ---------- */
