@@ -255,6 +255,21 @@
       if (r.top > window.innerHeight) { els[i].classList.add("reveal"); io.observe(els[i]); } // only things below the fold
     }
   }
-  function go() { drawBoards(); spy(); reveal(); }
+  // Thin bar at the top that fills as you read a lesson or guide
+  function progress() {
+    if (!document.querySelector(".with-side .art-main")) return;
+    var bar = document.createElement("div");
+    bar.className = "read-progress"; bar.setAttribute("aria-hidden", "true");
+    document.body.appendChild(bar);
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ")";
+    }
+    window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  }
+  function go() { drawBoards(); spy(); reveal(); progress(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
 })();

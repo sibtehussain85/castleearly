@@ -370,10 +370,10 @@ h3 { font-size: 1.2rem; margin: 1.6em 0 0.4em; }
 @keyframes card-pop { from { transform: scale(.8) translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* 3D headline with a moving shine */
-:root { --x1: #1d3d34; --x2: #15302a; }
-:root[data-theme="dark"] { --x1: #4f7a2a; --x2: #34561a; }
+:root { --x1: #cfe0d3; --x2: #b7cfbe; --x-shadow: rgba(47,93,80,.18); }
+:root[data-theme="dark"] { --x1: #4f7a2a; --x2: #34561a; --x-shadow: rgba(0,0,0,.28); }
 .hero-3d { position: relative; display: inline-block; letter-spacing: -0.02em;
-  text-shadow: 1px 1px 0 var(--x1), 2px 2px 0 var(--x1), 3px 3px 0 var(--x2), 4px 4px 0 var(--x2), 6px 9px 14px rgba(0,0,0,.28); }
+  text-shadow: 1px 1px 0 var(--x1), 2px 2px 0 var(--x1), 3px 3px 0 var(--x2), 4px 4px 0 var(--x2), 6px 9px 14px var(--x-shadow); }
 .hero-3d::after {
   content: attr(data-text); position: absolute; inset: 0; pointer-events: none; text-shadow: none;
   background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.75) 48%, rgba(255,255,255,0) 58%) no-repeat;
@@ -762,3 +762,41 @@ main.has-hero > .page-hero:first-child { margin-top: 0; }
 .adm-btns button.del { color: var(--bad); }
 .adm-item.confirm .del { background: var(--bad); color: #fff; border-color: var(--bad); }
 .adm-empty { color: var(--ink-soft); }
+
+
+/* ====== Easier, livelier reading on lessons and guides ====== */
+.has-hero .prose p, .has-hero .prose li { font-size: 1.08rem; line-height: 1.78; }
+.has-hero .prose p { margin: 0 0 1.05em; }
+:root:not([data-theme="dark"]) .has-hero .prose p, :root:not([data-theme="dark"]) .has-hero .prose li { color: #2b2721; }
+/* Section headings: a small board-square marker and a hairline underneath */
+.has-hero .prose h2 { position: relative; padding: 0 0 .35em 1.05em; border-bottom: 1px solid var(--line); margin-top: 2.2em; scroll-margin-top: 80px; }
+.has-hero .prose h2::before { content: ""; position: absolute; left: 0; top: .32em; width: .58em; height: .58em; border-radius: 3px;
+  background: linear-gradient(135deg, var(--accent) 0 50%, var(--brass) 50% 100%); }
+.has-hero .prose h3 { color: var(--accent); scroll-margin-top: 80px; }
+/* Key words look highlighted with a marker */
+.has-hero .prose p strong, .has-hero .prose li strong { font-weight: 700; color: var(--ink);
+  background: linear-gradient(transparent 62%, rgba(236,196,82,.42) 62%); padding: 0 .08em; border-radius: 2px; }
+:root[data-theme="dark"] .has-hero .prose p strong, :root[data-theme="dark"] .has-hero .prose li strong { background: linear-gradient(transparent 62%, rgba(232,176,74,.28) 62%); }
+.has-hero .callout strong, .has-hero .answer-box strong, .has-hero .key-facts strong { background: none; padding: 0; }
+/* Bullet lists: little board squares instead of dots */
+.has-hero .prose ul { list-style: none; padding-left: 0; }
+.has-hero .prose ul > li { position: relative; padding-left: 1.6em; margin: .45em 0; }
+.has-hero .prose ul > li::before { content: ""; position: absolute; left: .3em; top: .68em; width: .5em; height: .5em; border-radius: 2px;
+  background: var(--accent); transform: rotate(45deg); opacity: .85; }
+.has-hero .prose ol { padding-left: 1.4em; }
+.has-hero .prose ol > li::marker { color: var(--accent); font-weight: 700; }
+/* Tip and warning boxes with an icon */
+.has-hero .callout { position: relative; border: 1px solid var(--line); border-left: 4px solid var(--brass); background: var(--card);
+  border-radius: 0 14px 14px 0; padding: 16px 20px 16px 58px; box-shadow: 0 6px 20px rgba(31,28,23,.05); }
+.has-hero .callout::before { content: "\1F4A1"; position: absolute; left: 16px; top: 14px; width: 30px; height: 30px; display: grid; place-items: center;
+  font-size: 16px; border-radius: 50%; background: var(--tag-w-bg); }
+.has-hero .callout.warn { border-left-color: var(--bad); }
+.has-hero .callout.warn::before { content: "\26A0\FE0F"; background: var(--bad-bg); }
+.has-hero .callout p:last-child { margin-bottom: 0; }
+/* Reading progress bar under the header */
+.read-progress { position: fixed; left: 0; top: 0; height: 3px; width: 100%; z-index: 50; pointer-events: none;
+  background: linear-gradient(90deg, var(--accent), var(--brass)); transform-origin: 0 50%; transform: scaleX(0); }
+@media (max-width: 640px) {
+  .has-hero .prose p, .has-hero .prose li { font-size: 1.04rem; line-height: 1.72; }
+  .has-hero .callout { padding-left: 52px; }
+}
