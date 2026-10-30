@@ -1034,3 +1034,9 @@ details.fold[open] { padding-bottom: 8px; }
   html.rv-docked body { padding-bottom: 76px; }
   html.rv-docked .pb-reviewing .rv-steps { display: none; } /* the dock replaces the in-panel arrows on phones */
 }
+
+/* Personal notes ("From my games") */
+.has-hero .callout.mine { border-left-color: var(--accent); padding-left: 58px; }
+.has-hero .callout.mine::before { content: "\265E"; font-size: 18px; background: var(--good-bg); color: var(--accent); }
+.mine-h { font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
+.has-hero .prose .callout.mine .mine-h { font-size: .74rem; line-height: 1.4; margin: 0 0 4px; }
