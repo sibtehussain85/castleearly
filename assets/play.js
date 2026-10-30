@@ -244,7 +244,7 @@
     var left = el("div", "pb-left");
     this.topBar = el("div", "pb-player");
     this.boardEl = el("div", "pb-board");
-    this.boardEl.setAttribute("role", "grid");
+    this.boardEl.setAttribute("role", "group");
     this.boardEl.setAttribute("aria-label", "Chess board");
     this.botBar = el("div", "pb-player");
     left.appendChild(this.topBar); left.appendChild(this.boardEl); left.appendChild(this.botBar);
@@ -300,7 +300,7 @@
     this.sqEls = [];
     for (var i = 0; i < 64; i++) {
       var s = el("div", "pb-sq");
-      s.setAttribute("role", "gridcell");
+      s.setAttribute("role", "button");
       s.dataset.i = i;
       this.sqEls.push(s);
     }

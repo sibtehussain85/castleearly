@@ -130,7 +130,7 @@
     var self = this;
     var title = this.cfg.title || "Interactive board";
     this.root.innerHTML =
-      '<div class="board-wrap"><div class="board" role="grid" aria-label="Chess board"></div>' +
+      '<div class="board-wrap"><div class="board" role="group" aria-label="Chess board"></div>' +
       '<div class="controls">' +
       '<button type="button" data-a="start" aria-label="Go to start">&#9198;</button>' +
       '<button type="button" data-a="prev" aria-label="Previous move">&#9664;</button>' +
@@ -155,7 +155,7 @@
     for (var i = 0; i < 64; i++) {
       var sq = document.createElement("div");
       sq.className = "sq";
-      sq.setAttribute("role", "gridcell");
+      sq.setAttribute("role", "button");
       sq.addEventListener("click", this.onSquare.bind(this));
       this.squares.push(sq);
     }
