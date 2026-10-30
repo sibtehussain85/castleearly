@@ -15,6 +15,15 @@
 
   // board: array of 64, index = file + 8 * (7 - rank)  -> a8 is 0, h1 is 63
   function startBoard() { return START.split("").map(function (c) { return c === "." ? null : c; }); }
+  // Board from the piece part of a FEN (a8 first), for trainers that start from a custom position.
+  function fenBoard(fen) {
+    var out = [], rows = fen.split(" ")[0].split("/");
+    for (var r = 0; r < rows.length; r++) for (var k = 0; k < rows[r].length; k++) {
+      var ch = rows[r][k];
+      if (/[1-8]/.test(ch)) for (var n = 0; n < +ch; n++) out.push(null); else out.push(ch);
+    }
+    return out;
+  }
 
   function sqIndex(name) {
     var f = FILES.indexOf(name[0]);
@@ -116,7 +125,8 @@
     this.moves = this.cfg.moves;
     this.flip = this.cfg.orientation === "black";
     this.practiceSide = this.cfg.practiceSide || this.cfg.orientation || "white";
-    this.positions = [startBoard()];
+    this.off = this.cfg.black ? 1 : 0; // 1 when Black makes the first move of the line
+    this.positions = [this.cfg.fen ? fenBoard(this.cfg.fen) : startBoard()];
     for (var i = 0; i < this.moves.length; i++) this.positions.push(applyMove(this.positions[i], this.moves[i].uci));
     this.ply = 0;
     this.mode = "learn";
@@ -163,9 +173,10 @@
     // Move list
     var html = "";
     for (var m = 0; m < this.moves.length; m++) {
-      if (m % 2 === 0) html += '<span class="pair"><span class="num">' + (m / 2 + 1) + ".</span>";
+      var mm = m + this.off;
+      if (mm % 2 === 0 || m === 0) html += '<span class="pair"><span class="num">' + (Math.floor(mm / 2) + 1) + (mm % 2 ? "..." : ".") + "</span>";
       html += '<button type="button" data-ply="' + (m + 1) + '">' + this.moves[m].san + "</button>";
-      if (m % 2 === 1 || m === this.moves.length - 1) html += "</span>";
+      if (mm % 2 === 1 || m === this.moves.length - 1) html += "</span>";
     }
     this.listEl.innerHTML = html;
     this.listEl.addEventListener("click", function (e) {
@@ -238,7 +249,7 @@
   };
 
   Trainer.prototype.userColorIsWhite = function () { return this.practiceSide === "white"; };
-  Trainer.prototype.isUserTurn = function () { return (this.ply % 2 === 0) === this.userColorIsWhite(); };
+  Trainer.prototype.isUserTurn = function () { return ((this.ply + this.off) % 2 === 0) === this.userColorIsWhite(); };
 
   Trainer.prototype.setMode = function (mode) {
     this.mode = mode;
@@ -349,7 +360,8 @@
       this.noteEl.innerHTML = this.cfg.intro || "Press \u25b6 to step through the opening move by move.";
     } else {
       var m = this.moves[this.ply - 1];
-      var num = Math.floor((this.ply - 1) / 2) + 1 + ((this.ply - 1) % 2 === 0 ? ". " : "... ");
+      var pp = this.ply - 1 + this.off;
+      var num = Math.floor(pp / 2) + 1 + (pp % 2 === 0 ? ". " : "... ");
       this.noteEl.innerHTML = "<strong>" + num + m.san + "</strong> \u2014 " + m.note;
     }
 

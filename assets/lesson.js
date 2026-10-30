@@ -183,7 +183,7 @@
         '<div class="lq-top"><span class="lq-step">Question ' + (i + 1) + " of " + qs.length + '</span><span class="lq-score">Score ' + score + "</span></div>" +
         '<div class="lq-bar"><i style="width:' + (i / qs.length * 100) + '%"></i></div>' +
         '<div class="lq-main"><div class="lq-board"></div><div class="lq-side">' +
-        '<p class="lq-q"><strong>' + who + " to play, move " + q.moveNo + ".</strong> What's the main-line move?</p>" +
+        '<p class="lq-q"><strong>' + who + " to play" + (data.ask ? "." : ", move " + q.moveNo + ".") + "</strong> " + (data.ask || "What's the main-line move?") + "</p>" +
         '<div class="lq-opts">' + opts.map(function (o) { return '<button type="button" class="lq-opt" data-m="' + o + '">' + o + "</button>"; }).join("") + "</div>" +
         '<p class="lq-fb" hidden></p><button type="button" class="btn lq-next" hidden>' + (i + 1 < qs.length ? "Next question \u2192" : "See my score") + "</button></div></div>";
       drawBoard(box.querySelector(".lq-board"), q.fen, [], [], data.flip === 1);
