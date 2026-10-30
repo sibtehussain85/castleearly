@@ -252,7 +252,7 @@
     $("#an-board-title").textContent = g.white.name + " vs " + g.black.name + (g.result ? "  \u00b7  " + g.result.replace("1/2-1/2", "\u00bd-\u00bd") : "");
     var link = $("#an-board-link");
     if (g.url) { link.href = g.url; link.textContent = "View on " + SITE_NAME[g.site]; link.hidden = false; } else link.hidden = true;
-    b.onBack = function () { boardSec.hidden = true; var t = gamesSec.hidden ? form : gamesSec; t.scrollIntoView({ behavior: "smooth", block: "start" }); };
+    b.onBack = function () { if (b.review) b.endReview(true); boardSec.hidden = true; var t = gamesSec.hidden ? form : gamesSec; t.scrollIntoView({ behavior: "smooth", block: "start" }); };
     b.loadGame({ fen: parsed.fen, moves: parsed.moves, names: { w: label(g.white), b: label(g.black) }, flip: flipForUser, result: g.result });
     boardSec.scrollIntoView({ behavior: "smooth", block: "start" });
   }

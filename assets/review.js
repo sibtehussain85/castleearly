@@ -487,6 +487,9 @@
     if (this.reviewEl && this.reviewEl.parentNode) this.reviewEl.parentNode.removeChild(this.reviewEl);
     if (this.evalEl && this.evalEl.parentNode) this.evalEl.parentNode.removeChild(this.evalEl);
     if (this.arrowEl && this.arrowEl.parentNode) this.arrowEl.parentNode.removeChild(this.arrowEl);
+    if (this.dockEl && this.dockEl.parentNode) this.dockEl.parentNode.removeChild(this.dockEl);
+    this.dockEl = null;
+    document.documentElement.classList.remove("rv-docked");
     this.reviewEl = this.evalEl = this.arrowEl = null;
     if (quiet) return;
     var h = this.game.stack;
@@ -506,7 +509,7 @@
       '<div class="rv-graph" hidden></div>' +
       '<div class="rv-coach" aria-live="polite"></div>' +
       '<div class="rv-moves"></div>' +
-      '<div class="rv-nav">' +
+      '<div class="rv-nav rv-steps">' +
       '<button type="button" class="pb-btn" data-rv="first" aria-label="First move">\u23ee</button>' +
       '<button type="button" class="pb-btn" data-rv="prev" aria-label="Previous move">\u25c0</button>' +
       '<button type="button" class="pb-btn" data-rv="next" aria-label="Next move">\u25b6</button>' +
@@ -531,6 +534,42 @@
     });
     this.root.querySelector(".pb-side").appendChild(panel);
     this.reviewEl = panel;
+
+    // Phones: a bar fixed to the bottom of the screen, so the arrows are always under your thumb
+    // while the board stays in view. Also swipe on the board (arrow keys on a computer are set up below).
+    var old = document.querySelectorAll(".rv-dock");
+    for (var od = 0; od < old.length; od++) old[od].parentNode.removeChild(old[od]);
+    var dock = el("div", "rv-dock");
+    dock.setAttribute("role", "toolbar");
+    dock.setAttribute("aria-label", "Step through the game");
+    dock.innerHTML =
+      '<button type="button" data-rv="first" aria-label="First move">\u23ee</button>' +
+      '<button type="button" data-rv="prev" aria-label="Previous move">\u25c0</button>' +
+      '<span class="rv-dock-lbl" aria-live="polite"></span>' +
+      '<button type="button" data-rv="next" aria-label="Next move">\u25b6</button>' +
+      '<button type="button" data-rv="last" aria-label="Last move">\u23ed</button>';
+    dock.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-rv]");
+      if (!b) return;
+      var twin = panel.querySelector('.rv-nav [data-rv="' + b.getAttribute("data-rv") + '"]');
+      if (twin) twin.click();
+    });
+    document.body.appendChild(dock);
+    document.documentElement.classList.add("rv-docked");
+    this.dockEl = dock;
+
+    var sx = 0, sy = 0, st = 0;
+    this.boardEl.addEventListener("touchstart", function (e) {
+      if (!self.review || e.touches.length !== 1) return;
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+    }, { passive: true });
+    this.boardEl.addEventListener("touchend", function (e) {
+      var rv = self.review;
+      if (!rv || !st) return;
+      var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+      st = 0;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) self.reviewGo(rv.ply + (dx < 0 ? 1 : -1));
+    }, { passive: true });
 
     this.evalEl = el("div", "rv-eval", '<div class="rv-eval-w"></div><span class="rv-eval-n"></span>');
     this.evalEl.setAttribute("aria-hidden", "true");
@@ -588,6 +627,20 @@
     var rv = this.review;
     if (!rv) return;
     var ply = rv.ply, i = ply - 1;
+    if (this.dockEl) {
+      var lbl = this.dockEl.querySelector(".rv-dock-lbl"), txt = ply ? "Move " + Math.ceil(ply / 2) + (ply % 2 ? "" : "\u2026") + " " + rv.sans[i] : "Start";
+      var cc = rv.cls && i >= 0 ? rv.cls[i] : null;
+      lbl.innerHTML = "";
+      lbl.appendChild(document.createTextNode(txt));
+      if (cc && CLS[cc.cls]) {
+        var tag = document.createElement("b");
+        tag.style.color = CLS[cc.cls].col;
+        tag.textContent = " " + CLS[cc.cls].sym;
+        lbl.appendChild(tag);
+      }
+      this.dockEl.querySelector('[data-rv="prev"]').disabled = this.dockEl.querySelector('[data-rv="first"]').disabled = ply === 0;
+      this.dockEl.querySelector('[data-rv="next"]').disabled = this.dockEl.querySelector('[data-rv="last"]').disabled = ply === rv.moves.length;
+    }
     var info = rv.cls && i >= 0 ? rv.cls[i] : null;
     // badge on the moved piece
     if (info && this.lastMove) {

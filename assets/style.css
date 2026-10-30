@@ -1017,3 +1017,20 @@ details.fold[open] { padding-bottom: 8px; }
 .oq-again { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
 @media (max-width: 560px) { .oq-card { grid-template-columns: 84px minmax(0, 1fr); gap: 12px; } .oq-box { padding: 16px; } }
 .op-progress .op-quiz { font-weight: 700; font-size: .92rem; margin-left: auto; }
+
+/* ====== Game review: arrows fixed to the bottom of the screen on phones ====== */
+.rv-dock { display: none; }
+@media (max-width: 860px) {
+  .rv-dock { display: flex; align-items: center; gap: 6px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1200;
+    padding: 8px max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    background: var(--card); border-top: 1px solid var(--line); box-shadow: 0 -8px 24px rgba(0,0,0,.18); }
+  .rv-dock button { flex: 0 0 auto; width: 52px; height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper);
+    color: var(--ink); font-size: 1.15rem; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .rv-dock button[data-rv="prev"], .rv-dock button[data-rv="next"] { width: 64px; background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-size: 1.3rem; }
+  .rv-dock button:disabled { opacity: .35; }
+  .rv-dock button:active:not(:disabled) { transform: scale(.94); }
+  .rv-dock-lbl { flex: 1 1 auto; min-width: 0; text-align: center; font-weight: 700; font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rv-dock-lbl b { font-weight: 800; }
+  html.rv-docked body { padding-bottom: 76px; }
+  html.rv-docked .pb-reviewing .rv-steps { display: none; } /* the dock replaces the in-panel arrows on phones */
+}
