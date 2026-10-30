@@ -6,7 +6,7 @@ Every opening line and puzzle on the site is checked move by move with a chess e
 
 ## Tools
 - [Play Chess Online Free vs Computer or a Friend](https://castleearly.com/): Play chess free against the computer (Easy to Master/Stockfish) or a friend, then get free Stockfish analysis of every move. No sign-up, no download.
-- [Free Chess Game Analysis for Chess.com & Lichess](https://castleearly.com/analysis/): Analyze your Chess.com or Lichess games free with Stockfish: accuracy, blunders, best moves and an advantage graph. Just type your username. No sign-up.
+- [Free Chess Analysis and Game Review with Stockfish](https://castleearly.com/analysis/): Free chess analysis and game review with Stockfish: import your Chess.com or Lichess games or paste a PGN and see accuracy, blunders and best moves. No sign-up.
 
 ## Learn the rules
 - [How to Play Chess: Rules for Beginners](https://castleearly.com/learn/): Learn how to play chess step by step: the goal, the board, how each piece moves, check, checkmate, stalemate and draws. Free interactive boards for beginners.
