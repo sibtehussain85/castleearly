@@ -220,9 +220,11 @@
         '<option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option><option value="master">Master (Stockfish)</option></select></label>' +
         '<label class="pb-field"><span>Play as</span><select data-set="color" id="pb-color">' +
         '<option value="w">White</option><option value="b">Black</option><option value="r">Random</option></select></label>' +
-        "</div>";
+        "</div>" +
+        '<button type="button" class="pb-fs-top" data-fs="1" aria-label="Full screen" title="Full screen">\u26f6<span> Full screen</span></button>';
       r.appendChild(setup);
       setup.addEventListener("click", function (e) {
+        if (e.target.closest("[data-fs]")) { self.toggleFs(); return; }
         var b = e.target.closest("[data-opp]");
         if (!b) return;
         self.settings.opponent = b.getAttribute("data-opp");
@@ -258,9 +260,11 @@
       : this.kind === "puzzle"
       ? [["retry", "\u21ba Retry"], ["hint", "\ud83d\udca1 Hint"], ["flip", "\u21c5 Flip"], ["sound", ""]]
       : [["new", "\uff0b New game"], ["undo", "\u21b6 Undo"], ["hint", "\ud83d\udca1 Hint"], ["review", "\ud83d\udcc8 Analyze"], ["flip", "\u21c5 Flip"], ["sound", ""]];
+    if (this.kind !== "sandbox") buttons.push(["fs", "\u26f6 Full screen"]);
     buttons.forEach(function (b) {
       var btn = el("button", "pb-btn", b[1]);
       btn.type = "button"; btn.setAttribute("data-act", b[0]);
+      if (b[0] === "fs") { btn.className = "pb-btn pb-fs-btn"; btn.setAttribute("aria-label", "Full screen"); }
       tools.appendChild(btn);
     });
     this.soundBtn = tools.querySelector('[data-act="sound"]');
@@ -274,6 +278,7 @@
       if (a === "flip") { self.flipped = !self.flipped; self.render(); }
       if (a === "hint") self.hint();
       if (a === "review") self.openReview();
+      if (a === "fs") self.toggleFs();
       if (a === "sound") {
         SFX.setOn(!SFX.isOn());
         if (SFX.isOn()) SFX.move();
@@ -310,6 +315,45 @@
     window.addEventListener("pointerup", function (e) { self.onUp(e); });
     window.addEventListener("pointercancel", function () { self.cancelDrag(); });
     this.boardEl.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  };
+
+  // Full screen: the board fills the whole screen. Uses the browser's real full screen where it exists
+  // (computers, Android) and a fixed full-window layout everywhere (including iPhone, which has no full screen API).
+  Board.prototype.toggleFs = function (force) {
+    var on = force === undefined ? !this.fs : force;
+    if (on === !!this.fs) return;
+    var self = this, r = this.root, de = document.documentElement;
+    this.fs = on;
+    r.classList.toggle("pb-fs", on);
+    de.classList.toggle("pb-fs-lock", on);
+    var fsBtns = r.querySelectorAll('[data-act="fs"]');
+    for (var i = 0; i < fsBtns.length; i++) {
+      fsBtns[i].textContent = on ? "\u2715 Exit" : "\u26f6 Full screen";
+      fsBtns[i].setAttribute("aria-label", on ? "Exit full screen" : "Full screen");
+    }
+    var req = r.requestFullscreen || r.webkitRequestFullscreen;
+    var cur = document.fullscreenElement || document.webkitFullscreenElement;
+    if (on) {
+      this.fsScroll = window.scrollY;
+      if (req && !cur) { try { var pr = req.call(r, { navigationUI: "hide" }); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {} }
+      if (!this.fsWired) {
+        this.fsWired = true;
+        var sync = function () {
+          var c = document.fullscreenElement || document.webkitFullscreenElement;
+          if (!c && self.fs && self.fsNative) self.toggleFs(false);
+          self.fsNative = !!c;
+        };
+        document.addEventListener("fullscreenchange", sync);
+        document.addEventListener("webkitfullscreenchange", sync);
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape" && self.fs && !self.fsNative) self.toggleFs(false); });
+      }
+    } else {
+      this.fsNative = false;
+      var exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (cur && exit) { try { var pe = exit.call(document); if (pe && pe.catch) pe.catch(function () {}); } catch (e) {} }
+      if (this.fsScroll !== undefined) window.scrollTo(0, this.fsScroll);
+    }
+    this.render();
   };
 
   Board.prototype.updateSoundBtn = function () {
