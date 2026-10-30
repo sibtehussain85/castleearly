@@ -1040,3 +1040,8 @@ details.fold[open] { padding-bottom: 8px; }
 .has-hero .callout.mine::before { content: "\265E"; font-size: 18px; background: var(--good-bg); color: var(--accent); }
 .mine-h { font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 .has-hero .prose .callout.mine .mine-h { font-size: .74rem; line-height: 1.4; margin: 0 0 4px; }
+.has-hero .callout.clubtip { border-left-color: var(--brass); padding-left: 20px; }
+.has-hero .callout.clubtip::before { display: none; }
+.has-hero .callout.clubtip .mine-h { color: var(--brass); }
+:root .has-hero .prose .callout .mine-h { font-size: .74rem; line-height: 1.4; margin: 0 0 4px; color: var(--accent); }
+:root .has-hero .prose .callout.clubtip .mine-h { color: var(--brass); }
