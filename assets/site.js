@@ -10,7 +10,7 @@
     function lockPage() {
       lockTimer = 0;
       if (!nav.classList.contains("open")) return;
-      savedY = window.scrollY || window.pageYOffset || 0;
+      // Use the position from before the menu opened (the open menu pushes the page down for a frame).
       body.style.position = "fixed"; body.style.top = -savedY + "px";
       body.style.left = "0"; body.style.right = "0"; body.style.width = "100%";
       html.classList.add("menu-open");
