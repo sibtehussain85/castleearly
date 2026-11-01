@@ -6,18 +6,30 @@
        header and sends the open menu off-screen when you're scrolled down). The header is pinned
        to the top of the screen while the menu is open, then the scroll position is restored. */
     var html = document.documentElement, body = document.body, savedY = 0;
-    function openMenu() {
+    var lockTimer = 0;
+    function lockPage() {
+      lockTimer = 0;
+      if (!nav.classList.contains("open")) return;
       savedY = window.scrollY || window.pageYOffset || 0;
       body.style.position = "fixed"; body.style.top = -savedY + "px";
       body.style.left = "0"; body.style.right = "0"; body.style.width = "100%";
       html.classList.add("menu-open");
+    }
+    function openMenu() {
+      // Show the menu first (fast paint), then pin the page on the next frame:
+      // pinning re-lays out the whole page, which made the tap feel slow.
+      savedY = window.scrollY || window.pageYOffset || 0;
       nav.classList.add("open"); btn.setAttribute("aria-expanded", "true");
       nav.scrollTop = 0;
+      requestAnimationFrame(function () { lockTimer = setTimeout(lockPage, 0); });
     }
     function closeMenu(jumping) {
       if (!nav.classList.contains("open")) return;
+      if (lockTimer) { clearTimeout(lockTimer); lockTimer = 0; }
+      var wasLocked = html.classList.contains("menu-open");
       nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false");
       html.classList.remove("menu-open");
+      if (!wasLocked) return;
       body.style.position = body.style.top = body.style.left = body.style.right = body.style.width = "";
       if (!jumping) {
         var prev = html.style.scrollBehavior; html.style.scrollBehavior = "auto";

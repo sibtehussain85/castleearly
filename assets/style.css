@@ -295,6 +295,22 @@ h3 { font-size: 1.2rem; margin: 1.6em 0 0.4em; }
 
 .playboard.compact .pb-main { grid-template-columns: minmax(0, 440px) minmax(200px, 1fr); }
 
+/* Reserve room for boards before the script builds them, so the page doesn't jump (CLS).
+   Heights are a little under the real built heights. */
+.playboard:not(.pb)[data-kind="play"] { min-height: 720px; }
+.playboard:not(.pb)[data-kind="puzzle"] { min-height: 340px; }
+.playboard:not(.pb)[data-kind="drill"] { min-height: 490px; }
+.playboard:not(.pb)[data-kind="sandbox"] { min-height: 400px; }
+@media (max-width: 860px) {
+  .playboard:not(.pb)[data-kind="play"] { min-height: calc(100vw - 40px + 500px); }
+  .playboard:not(.pb)[data-kind="puzzle"] { min-height: calc(100vw - 40px + 280px); }
+  .playboard:not(.pb)[data-kind="drill"] { min-height: calc(100vw - 40px + 460px); }
+  .playboard:not(.pb)[data-kind="sandbox"] { min-height: calc(100vw - 40px + 230px); }
+}
+@media (max-width: 480px) {
+  .playboard:not(.pb)[data-kind="play"] { min-height: calc(100vw - 40px + 680px); }
+}
+
 @media (max-width: 860px) {
   .pb-main, .playboard.compact .pb-main { grid-template-columns: 1fr; }
   .pb-moves { height: 140px; }
