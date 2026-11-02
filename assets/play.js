@@ -275,8 +275,8 @@
       var a = b.getAttribute("data-act");
       if (a === "new") self.newGame();
       if (a === "retry") self.newGame();
-      if (a === "undo") self.undo();
-      if (a === "redo") self.redo();
+      // Mouse/touch presses on Undo/Redo are handled on pointerdown (hold to repeat); keyboard clicks land here
+      if ((a === "undo" || a === "redo") && e.detail === 0) self[a]();
       if (a === "flip") { self.flipped = !self.flipped; self.render(); }
       if (a === "hint") self.hint();
       if (a === "review") self.openReview();
@@ -287,6 +287,28 @@
         self.updateSoundBtn();
       }
     });
+    // Hold Undo or Redo to keep stepping, like Chess.com: one step at once, then repeats while held
+    var hold = null;
+    var stopHold = function () { if (hold) { clearTimeout(hold.t); hold = null; } };
+    tools.addEventListener("pointerdown", function (e) {
+      var b = e.target.closest('[data-act="undo"],[data-act="redo"]');
+      if (!b || b.disabled || (e.button !== undefined && e.button !== 0)) return;
+      e.preventDefault();
+      stopHold();
+      var act = b.getAttribute("data-act");
+      try { b.setPointerCapture(e.pointerId); } catch (err) {}
+      hold = { btn: b };
+      var step = function (delay) {
+        if (!hold || hold.btn !== b) return;
+        self[act]();
+        if (b.disabled) return stopHold();
+        hold.t = setTimeout(function () { step(Math.max(70, delay * 0.85)); }, delay);
+      };
+      self[act]();
+      hold.t = setTimeout(function () { step(140); }, 420);
+    });
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (ev) { tools.addEventListener(ev, stopHold); });
+    window.addEventListener("blur", stopHold);
     this.noticeEl = el("div", "pb-notice");
     this.noticeEl.hidden = true;
     side.appendChild(this.noticeEl);
@@ -316,7 +338,7 @@
     window.addEventListener("pointermove", function (e) { self.onMove(e); }, { passive: false });
     window.addEventListener("pointerup", function (e) { self.onUp(e); });
     window.addEventListener("pointercancel", function () { self.cancelDrag(); });
-    this.boardEl.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    this.boardEl.addEventListener("contextmenu", function (e) { e.preventDefault(); self.cancelDrag(); self.clearPremoves(); });
   };
 
   // Full screen: the board fills the whole screen. Uses the browser's real full screen where it exists
@@ -369,7 +391,7 @@
   Board.prototype.isHumanTurn = function () {
     if (this.review || this.kind === "review") return false;
     if (this.kind === "sandbox") return !this.thinking;
-    if (this.over || this.thinking) return false;
+    if (this.over || this.thinking || this.prePending) return false;
     if (this.kind === "play" && this.settings.opponent === "friend") return true;
     return this.game.turn === this.myColor;
   };
@@ -377,7 +399,7 @@
   Board.prototype.newGame = function (silent) {
     if (this.review && this.endReview) this.endReview(true);
     this.game = new Chess(this.startFen);
-    this.redoStack = [];
+    this.redoStack = []; this.premoves = []; this.prePending = false;
     this.over = null; this.selected = -1; this.thinking = false; this.lastMove = null;
     this.puzzleStep = 0; this.hintSq = -1; this.mistakes = 0;
     this.token = (this.token || 0) + 1;
@@ -480,6 +502,8 @@
     else if (res.captured) SFX.capture();
     else if (res.flag === "k" || res.flag === "q") SFX.castle();
     else SFX.move();
+    if (st.over) { this.premoves = []; this.prePending = false; }
+    else if (byComputer && this.premoves && this.premoves.length) this.queuePremove();
     this.render();
     this.save();
     if (!st.over && this.kind !== "puzzle") this.maybeComputerMove();
@@ -502,7 +526,7 @@
   Board.prototype.undo = function () {
     if (this.kind === "puzzle" || this.review) return;
     this.token++;
-    this.thinking = false;
+    this.thinking = false; this.premoves = []; this.prePending = false;
     var n = this.isComputerGame() ? (this.game.turn === this.myColor ? 2 : 1) : 1;
     var undone = false, group = [];
     for (var i = 0; i < n; i++) {
@@ -527,7 +551,7 @@
   Board.prototype.redo = function () {
     if (this.kind === "puzzle" || this.review || !this.redoStack || !this.redoStack.length) return;
     this.token++;
-    this.thinking = false;
+    this.thinking = false; this.premoves = []; this.prePending = false;
     var group = this.redoStack.pop(), res = null, last = null;
     for (var i = 0; i < group.length; i++) {
       res = this.game.move({ from: group[i].from, to: group[i].to, promotion: group[i].promo || "q" });
@@ -633,6 +657,81 @@
   };
 
   /* ---------- Input ---------- */
+
+  /* ---------- Premoves (like Chess.com): queue moves while the computer thinks ---------- */
+  // Allowed in games against the computer while it's the computer's turn. Moves are checked only by how the
+  // piece moves (blockers ignored), then played the moment it's your turn if they are legal; otherwise the
+  // whole queue is cancelled. Right-click, or tap a square that isn't a target, to cancel.
+  Board.prototype.canPremove = function () {
+    return !this.review && !this.over && this.isComputerGame() && (this.thinking || this.prePending) &&
+      this.overlay.hidden && (this.premoves || []).length < 8;
+  };
+  // The board as it will look after the queued premoves (used for display and further premoves)
+  Board.prototype.preBoard = function () {
+    var b = this.game.board.slice(), q = this.premoves || [];
+    for (var k = 0; k < q.length; k++) {
+      var f = q[k].from, t = q[k].to, p = b[f];
+      if (!p) continue;
+      b[f] = null;
+      if (p.toLowerCase() === "k" && Math.abs(t - f) === 2) { var rf = t > f ? f + 3 : f - 4, rt = t > f ? f + 1 : f - 1; b[rt] = b[rf]; b[rf] = null; }
+      if (p.toLowerCase() === "p" && ((t >> 3) === 7 || (t >> 3) === 0)) p = p === "P" ? "Q" : "q";
+      b[t] = p;
+    }
+    return b;
+  };
+  Board.prototype.isMine = function (b, i) {
+    var p = b[i];
+    return !!p && ((p === p.toUpperCase()) === (this.myColor === "w"));
+  };
+  Board.prototype.preTargets = function (b, i) {
+    var p = b[i], out = [], self = this;
+    if (!p || !this.isMine(b, i)) return out;
+    var t = p.toLowerCase(), f = i & 7, r = i >> 3, white = p === "P" || p === p.toUpperCase();
+    function add(ff, rr) { if (ff < 0 || ff > 7 || rr < 0 || rr > 7) return false; var j = rr * 8 + ff; if (!self.isMine(b, j)) out.push(j); return true; }
+    function ray(df, dr) { for (var s = 1; s < 8; s++) if (!add(f + df * s, r + dr * s)) break; }
+    if (t === "n") [[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]].forEach(function (d) { add(f + d[0], r + d[1]); });
+    if (t === "b" || t === "q") { ray(1,1); ray(1,-1); ray(-1,1); ray(-1,-1); }
+    if (t === "r" || t === "q") { ray(1,0); ray(-1,0); ray(0,1); ray(0,-1); }
+    if (t === "k") {
+      for (var df = -1; df <= 1; df++) for (var dr = -1; dr <= 1; dr++) if (df || dr) add(f + df, r + dr);
+      var home = white ? 0 : 7;
+      if (r === home && f === 4) { add(6, home); add(2, home); }
+    }
+    if (t === "p") {
+      var dir = white ? 1 : -1, start = white ? 1 : 6;
+      add(f, r + dir); if (r === start) add(f, r + 2 * dir);
+      add(f - 1, r + dir); add(f + 1, r + dir);
+    }
+    return out;
+  };
+  Board.prototype.addPremove = function (from, to) {
+    (this.premoves = this.premoves || []).push({ from: from, to: to });
+    this.selected = -1;
+    if (SFX.premove) SFX.premove();
+    this.render();
+  };
+  Board.prototype.clearPremoves = function () {
+    if (!this.premoves || !this.premoves.length) return false;
+    this.premoves = []; this.prePending = false; this.selected = -1;
+    this.render();
+    return true;
+  };
+  // Wait for the computer's piece to finish sliding, then play the first queued premove
+  Board.prototype.queuePremove = function () {
+    var self = this, token = this.token;
+    this.prePending = true;
+    setTimeout(function () {
+      if (token !== self.token) return;
+      self.prePending = false;
+      var q = self.premoves || [], mv = q.shift();
+      if (!mv || self.over || self.game.turn !== self.myColor) { self.premoves = []; self.render(); return; }
+      var from = nm(mv.from), to = nm(mv.to);
+      var ok = self.game.moves(from).some(function (m) { return m.to === to && (m.captured || "").toLowerCase() !== "k"; });
+      if (!ok) { self.premoves = []; self.render(); return; }
+      self.applyMove(from, to, "q");
+    }, REDUCED ? 30 : SLIDE_MS + 20);
+  };
+
   Board.prototype.squareFromPoint = function (x, y) {
     var r = this.boardEl.getBoundingClientRect();
     if (x < r.left || x >= r.right || y < r.top || y >= r.bottom) return -1;
@@ -666,13 +765,26 @@
     if (!this.overlay.hidden) return;
     var i = this.squareFromPoint(e.clientX, e.clientY);
     if (i < 0) return;
-    if (!this.isHumanTurn()) return;
+    if (!this.isHumanTurn()) {
+      if (!this.canPremove()) return;
+      var vb = this.preBoard();
+      if (this.selected >= 0 && this.selected !== i && !this.isMine(vb, i)) {
+        if (this.preTargets(vb, this.selected).indexOf(i) >= 0) this.addPremove(this.selected, i);
+        else { this.clearPremoves(); this.selected = -1; this.render(); }
+        return;
+      }
+      if (!this.isMine(vb, i)) { if (!this.clearPremoves()) { this.selected = -1; this.render(); } return; }
+      return this.startDrag(e, i);
+    }
     if (this.selected >= 0 && this.selected !== i && !this.isOwnPiece(i)) {
       // second tap on a target square
       if (!this.tryMove(this.selected, i)) { this.selected = -1; this.render(); }
       return;
     }
     if (!this.isOwnPiece(i)) { this.selected = -1; this.render(); return; }
+    this.startDrag(e, i);
+  };
+  Board.prototype.startDrag = function (e, i) {
     e.preventDefault();
     var wasSelected = this.selected === i;
     this.selected = i;
@@ -706,6 +818,10 @@
     for (var k = 0; k < 64; k++) this.sqEls[k].classList.remove("pb-hover");
     var to = this.squareFromPoint(e.clientX, e.clientY);
     if (d.moved) {
+      if (!this.isHumanTurn()) {
+        if (to >= 0 && to !== d.from && this.canPremove() && this.preTargets(this.preBoard(), d.from).indexOf(to) >= 0) return this.addPremove(d.from, to);
+        this.selected = -1; this.render(); return;
+      }
       this.skipAnim = true;
       if (to >= 0 && to !== d.from && this.tryMove(d.from, to)) return;
       this.skipAnim = false;
@@ -750,7 +866,7 @@
     this.names = g.names || null;
     this.flipped = !!g.flip; this.myColor = g.flip ? "b" : "w";
     this.over = { title: "", sub: "", result: g.result || "" };
-    this.selected = -1; this.hintSq = -1; this.thinking = false; this.message = "";
+    this.selected = -1; this.hintSq = -1; this.thinking = false; this.message = ""; this.premoves = []; this.prePending = false;
     var h = this.game.stack;
     this.lastMove = h.length ? [h[h.length - 1].m.from, h[h.length - 1].m.to] : null;
     this.reviewCache = null;
@@ -810,7 +926,7 @@
       this.settings = d.s; this.myColor = d.c;
       this.game = new Chess(this.startFen);
       for (var i = 0; i < d.m.length; i++) if (!this.game.move(d.m[i])) return false;
-      this.over = null; this.selected = -1; this.thinking = false; this.hintSq = -1;
+      this.over = null; this.selected = -1; this.thinking = false; this.hintSq = -1; this.premoves = []; this.prePending = false;
       this.token = 1;
       var h = this.game.stack;
       this.lastMove = h.length ? [h[h.length - 1].m.from, h[h.length - 1].m.to] : null;
@@ -890,8 +1006,11 @@
   };
 
   Board.prototype.render = function () {
-    var g = this.game, b = g.board;
-    var legalTargets = this.selected >= 0 ? this.targetsFrom(this.selected) : [];
+    var g = this.game, pq = this.premoves || [], preMode = !this.isHumanTurn() && this.canPremove();
+    var b = pq.length ? this.preBoard() : g.board;
+    var legalTargets = this.selected >= 0 ? (preMode ? this.preTargets(b, this.selected) : this.targetsFrom(this.selected)) : [];
+    var preSq = {};
+    pq.forEach(function (m) { preSq[m.from] = preSq[m.to] = 1; });
     var checkSq = g.inCheck() ? g.kings[g.turn] : -1;
 
     // squares in display order
@@ -904,6 +1023,7 @@
       var cls = "pb-sq " + (light ? "l" : "d");
       if (this.lastMove && (i === this.lastMove[0] || i === this.lastMove[1])) cls += " last";
       if (i === this.selected) cls += " sel";
+      if (preSq[i]) cls += " pre";
       if (i === checkSq) cls += " check";
       if (i === this.hintSq || (this.hintTo === i && this.hintSq >= 0)) cls += " hint";
       if (legalTargets.indexOf(i) >= 0) cls += p ? " cap" : " dot";
@@ -939,7 +1059,8 @@
     else if (this.kind === "puzzle") {
       text = "<b>" + (g.turn === "w" ? "White" : "Black") + " to move.</b> " + (this.puzzle.prompt || "Find the best move.");
     } else if (this.over) { text = "<b>" + this.over.title + "</b> " + this.over.sub; }
-    else if (this.thinking) text = "Computer is thinking\u2026";
+    else if (pq.length) text = "<b>Premove" + (pq.length > 1 ? "s (" + pq.length + ")" : "") + " set.</b> Right-click or tap an empty square to cancel.";
+    else if (this.thinking) text = "Computer is thinking\u2026 <span class='pb-sub'>You can premove.</span>";
     else if (this.isComputerGame()) text = g.turn === this.myColor ? "<b>Your move.</b> Drag a piece or tap it, then tap a square." : "";
     else text = "<b>" + (g.turn === "w" ? "White" : "Black") + " to move.</b>";
     if (!this.over && g.inCheck() && this.kind !== "puzzle" && this.kind !== "sandbox") text += " <b class='pb-warn'>Check!</b>";
