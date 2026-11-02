@@ -142,7 +142,7 @@ ${sc.faq}
 
   const html = head + HEADER + hero + '\n' + body + side + FOOTER;
   const dir = `${SITE}/${p.sec || 'openings'}/${p.slug}`;
-  let out = html;
+  let out = L.boardFirst(html); // interactive board on the first screen (Nov 2, 2026)
   if (p.sec === 'learn') out = out.replace('<a href="/openings/" aria-current="page">Openings', '<a href="/openings/">Openings').replace('<div class="nav-dd"><a href="/learn/">Learn', '<div class="nav-dd"><a href="/learn/" aria-current="page">Learn');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(`${dir}/index.html`, out);

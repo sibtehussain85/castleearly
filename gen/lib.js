@@ -66,3 +66,25 @@ function card({ href, line: l, flip, tag, tagCls, title, text }) {
 const strip = h => h.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
 
 module.exports = { split, esc, boardFen, pos, mv, story, quickCheck, trainer, ideas, keyFacts, faqHtml, card, strip };
+
+// Board first: move the page's first trainer up under a compact hero (crumbs, title, byline), so visitors see an
+// interactive board on the first screen. The hero intro paragraph becomes the lead paragraph of the article, the
+// decorative hero board is dropped, and a short link is left where the trainer used to be. Safe to run twice.
+function boardFirst(html) {
+  if (html.includes('id="top-board"')) return html;
+  const tStart = html.indexOf('<div class="trainer">');
+  if (tStart < 0) return html;
+  const tEnd = html.indexOf('</script>\n</div>', tStart) + '</script>\n</div>'.length;
+  const trainerHtml = html.slice(tStart, tEnd);
+  let out = html.slice(0, tStart) + '<p class="to-top-board"><a href="#top-board">▲ Step through this line on the board at the top of the page</a></p>' + html.slice(tEnd);
+  // drop the decorative hero board
+  out = out.replace(/<figure class="ph-board">[\s\S]*?<\/figure>/, '').replace('<div class="page-hero has-board">', '<div class="page-hero">');
+  // hero intro paragraph -> lead paragraph of the article
+  let lead = '';
+  out = out.replace(/(<div class="meta-row">[\s\S]*?<\/div>)(<p>[\s\S]*?<\/p>)(<\/div>)/, (m, meta, p, close) => { lead = p.replace('<p>', '<p class="lead">'); return meta + close; });
+  const top = `<section class="top-board" id="top-board" aria-label="Interactive board">\n${trainerHtml}\n</section>\n`;
+  out = out.replace('<article>', top + '<article>');
+  if (lead) out = out.replace('<div class="article-head prose" data-head="1">\n', m => m + lead + '\n');
+  return out;
+}
+module.exports.boardFirst = boardFirst;
