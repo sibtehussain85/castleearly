@@ -2,10 +2,10 @@
 const fs = require('fs');
 const { line, sf, uciToSan } = require('./chesslib');
 const L = require('./lib');
-const pages = require('./pages').concat(require('./pages2'));
+const pages = require('./pages').concat(require('./pages2'), require('./pages3'));
 
 const SITE = '/home/claude/castleearly';
-const TODAY = '2026-10-30';
+const DEFAULT_DATE = '2026-10-30';
 const shell = fs.readFileSync(SITE + '/openings/petrov-defense/index.html', 'utf8');
 const headerEnd = shell.indexOf('<main');
 const footerStart = shell.indexOf('<footer');
@@ -52,7 +52,7 @@ async function buildQuiz(p) {
   return Object.assign({ slug: p.slug, side: p.quiz.side, flip: p.quiz.flip }, p.quiz.ask ? { ask: p.quiz.ask } : {}, { questions: out });
 }
 
-function schema(p, url) {
+function schema(p, url, TODAY) {
   const article = {
     '@context': 'https://schema.org', '@type': 'Article', headline: p.ogTitle, description: p.desc,
     image: `https://castleearly.com/assets/og/${p.sec || 'openings'}-${p.slug}.jpg`,
@@ -72,8 +72,12 @@ function schema(p, url) {
 
 async function buildPage(p) {
   console.log('Building ' + p.slug);
+  // Pages may carry their own publish date (p.date, YYYY-MM-DD); older pages keep the original date.
+  const TODAY = p.date || DEFAULT_DATE;
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const dateLabel = `${MONTHS[+TODAY.slice(5, 7) - 1]} ${+TODAY.slice(8, 10)}, ${TODAY.slice(0, 4)}`;
   const url = `https://castleearly.com/${p.sec || 'openings'}/${p.slug}/`;
-  const sc = schema(p, url);
+  const sc = schema(p, url, TODAY);
   const head = `<!DOCTYPE html>
 
 <html lang="en" data-default-theme="light">
@@ -116,7 +120,7 @@ ${sc.faq}
 </head>
 `;
   const hp = L.pos(p.hero.line);
-  const hero = `<main class="wrap has-hero"><div class="page-hero has-board"><div class="page-hero-in"><div class="ph-text"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <a href="/${p.sec || 'openings'}/">${p.sec === 'learn' ? 'Learn' : 'Openings'}</a> › ${L.esc(p.name)}</nav><p class="eyebrow">${L.esc(p.eyebrow)}</p><h1>${L.esc(p.h1)}</h1><div class="meta-row"><span>By <a href="/about/">Hussain</a></span><span>Updated October 30, 2026</span><span>${p.readMin} min read</span></div><p>${L.esc(p.intro)}</p></div><figure class="ph-board"><div class="mini-board" data-fen="${L.boardFen(hp.fen)}" data-hl="${hp.hl}" data-flip="${p.hero.flip}" aria-hidden="true"></div><figcaption>${L.esc(p.hero.cap)}</figcaption></figure></div></div>`;
+  const hero = `<main class="wrap has-hero"><div class="page-hero has-board"><div class="page-hero-in"><div class="ph-text"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <a href="/${p.sec || 'openings'}/">${p.sec === 'learn' ? 'Learn' : 'Openings'}</a> › ${L.esc(p.name)}</nav><p class="eyebrow">${L.esc(p.eyebrow)}</p><h1>${L.esc(p.h1)}</h1><div class="meta-row"><span>By <a href="/about/">Hussain</a></span><span>Updated ${dateLabel}</span><span>${p.readMin} min read</span></div><p>${L.esc(p.intro)}</p></div><figure class="ph-board"><div class="mini-board" data-fen="${L.boardFen(hp.fen)}" data-hl="${hp.hl}" data-flip="${p.hero.flip}" aria-hidden="true"></div><figcaption>${L.esc(p.hero.cap)}</figcaption></figure></div></div>`;
 
   // Body blocks: strings are prose (the first one sits directly under the head like the shell does), objects are trainers.
   let body = `<article><div class="with-side"><div class="art-main">\n<div class="article-head prose" data-head="1">\n${p.head()}\n</div>\n`;
