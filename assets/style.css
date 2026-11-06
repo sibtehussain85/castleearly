@@ -228,8 +228,10 @@ h3 { font-size: 1.2rem; margin: 1.6em 0 0.4em; }
   position: relative; width: 100%; max-width: 100%; aspect-ratio: 1 / 1;
   display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
   border-radius: 4px; overflow: hidden; user-select: none; -webkit-user-select: none;
-  touch-action: none; box-shadow: 0 6px 24px rgba(31, 28, 23, 0.18);
+  touch-action: pan-y; box-shadow: 0 6px 24px rgba(31, 28, 23, 0.18);
 }
+/* Easy swipe: only your own pieces capture the finger; locked boards and full screen take every touch */
+.pb-sq.grab, .pb.pb-locked .pb-board, .pb.pb-fs .pb-board { touch-action: none; }
 .pb-sq { position: relative; display: flex; align-items: center; justify-content: center; }
 .pb-sq.l { background: var(--pb-light); }
 .pb-sq.d { background: var(--pb-dark); }
@@ -1144,3 +1146,60 @@ html { scroll-padding-top: 76px; }
 .pz-coach:empty { display: none; }
 .pz-coach .co-t { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: .94rem; }
 .coach-link { margin: 10px 0 0; font-weight: 600; }
+
+/* ---------- Touch bar under boards (phones and tablets only) ---------- */
+.pb-touch { display: none; }
+@media (pointer: coarse) {
+  .pb-touch { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: .8rem; color: var(--ink-soft); }
+  .pb-lock { font: inherit; font-size: .8rem; font-weight: 700; padding: 6px 10px; border-radius: 99px; border: 1px solid var(--line); background: var(--card); color: var(--ink); white-space: nowrap; }
+  .pb.pb-locked .pb-lock { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+}
+.pb.pb-fs .pb-touch { display: none; }
+
+/* ---------- App-style full screen ---------- */
+.pb-fs-bar { display: none; }
+.pb.pb-fs .pb-fs-bar { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 980px; margin: 0 auto 6px; flex: 0 0 auto; }
+.pb-fs-logo { font-family: var(--serif); font-weight: 700; font-size: 1.05rem; color: var(--accent); white-space: nowrap; }
+.pb-fs-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--ink-soft); font-size: .9rem; }
+.pb-fs-exit { font: inherit; font-weight: 700; font-size: .95rem; padding: 9px 16px; border-radius: 99px; border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+.pb.pb-fs .pb-tools .pb-fs-btn { display: none; }
+.pb.pb-fs .pb-btn { min-height: 46px; border-radius: 12px; font-weight: 700; }
+@media (orientation: portrait) {
+  .pb.pb-fs { --fs: min(calc(100vw - 20px), calc(100vh - 360px)); --fs: min(calc(100vw - 20px), calc(100dvh - 360px)); }
+  .pb.pb-fs .pb-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* Coach comments inside full screen */
+.pb.pb-fs .co-panel { flex: 1 1 auto; min-height: 90px; display: flex; flex-direction: column; overflow: hidden; }
+.pb.pb-fs .co-panel .co-list { max-height: none; flex: 1 1 auto; overflow-y: auto; }
+.pb.pb-fs .co-head { padding: 6px 10px; }
+.pb.pb-fs.has-co .pb-moves { display: none !important; }
+@media (orientation: landscape) and (min-width: 700px) {
+  .pb.pb-fs .co-panel { max-height: calc(var(--fs) - 160px); }
+}
+
+/* ---------- Big Coach buttons ---------- */
+.coach-link { margin: 16px 0 4px; }
+.coach-link a, .coach-start {
+  display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 620px;
+  padding: 15px 20px; border-radius: 14px; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); font: inherit; font-size: 1.08rem; font-weight: 800; text-decoration: none;
+  box-shadow: 0 6px 18px rgba(47, 93, 80, 0.28); transition: transform .12s ease, background .12s ease;
+}
+.coach-link a:hover, .coach-start:hover { background: var(--accent-hover); color: var(--accent-ink); transform: translateY(-1px); }
+.coach-link a small { font-weight: 600; opacity: .85; font-size: .85rem; }
+.coach-intro .coach-start { flex: 1 1 260px; }
+
+/* ---------- Install the app ---------- */
+.ce-install { font: inherit; font-weight: 700; cursor: pointer; border-radius: 99px; border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 7px 14px; }
+.ce-install:hover { background: var(--accent); color: var(--accent-ink); }
+.ce-install[hidden] { display: none; }
+.site-footer .ce-install { margin: 8px 0 0; }
+.nav .ce-install { margin: 10px 14px; }
+.ce-ios { position: fixed; z-index: 4000; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: 0 12px 40px rgba(0,0,0,.3); }
+.ce-ios p { margin: 0 0 10px; line-height: 1.5; }
+.ce-ios button { font: inherit; font-weight: 700; padding: 8px 14px; border-radius: 10px; border: 0; background: var(--accent); color: var(--accent-ink); }
+.pb-fs-app { font: inherit; font-size: .82rem; font-weight: 700; padding: 8px 12px; border-radius: 99px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.pb.pb-fs .pb-status, .pb.pb-fs .pb-tools, .pb.pb-fs .pb-player { flex: 0 0 auto; }
+.pb.pb-fs.has-co .pb-status a { display: none; }
+.coach-link a { flex-direction: column; gap: 2px; text-align: center; }
+.coach-link a small { display: block; }

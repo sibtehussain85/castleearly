@@ -16,5 +16,35 @@
       "sizes": "512x512",
       "type": "image/png"
     }
+  ],
+  "id": "/",
+  "scope": "/",
+  "description": "Play chess free, learn openings with an AI Coach, solve puzzles and analyze your games.",
+  "orientation": "any",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "categories": [
+    "games",
+    "education"
+  ],
+  "shortcuts": [
+    {
+      "name": "Play",
+      "url": "/"
+    },
+    {
+      "name": "Openings",
+      "url": "/openings/"
+    },
+    {
+      "name": "Tactics",
+      "url": "/tactics/"
+    },
+    {
+      "name": "Free Analysis",
+      "url": "/analysis/"
+    }
   ]
 }

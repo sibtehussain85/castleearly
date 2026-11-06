@@ -248,6 +248,13 @@
     this.boardEl.setAttribute("aria-label", "Chess board");
     this.botBar = el("div", "pb-player");
     left.appendChild(this.topBar); left.appendChild(this.boardEl); left.appendChild(this.botBar);
+    if (this.kind !== "review") {
+      this.touchBar = el("div", "pb-touch");
+      this.touchBar.innerHTML = '<span class="pb-touch-t"></span><button type="button" class="pb-lock"></button>';
+      left.appendChild(this.touchBar);
+      this.touchBar.querySelector(".pb-lock").addEventListener("click", function () { self.setTouchLock(!self.touchLocked()); });
+      this.paintTouch();
+    }
 
     var side = el("div", "pb-side");
     this.statusEl = el("div", "pb-status");
@@ -334,10 +341,27 @@
     this.boardEl.appendChild(this.overlay);
 
     // pointer input (mouse + touch): drag or tap-tap
-    this.boardEl.addEventListener("pointerdown", function (e) { self.onDown(e); });
-    window.addEventListener("pointermove", function (e) { self.onMove(e); }, { passive: false });
-    window.addEventListener("pointerup", function (e) { self.onUp(e); });
-    window.addEventListener("pointercancel", function () { self.cancelDrag(); });
+    // Easy swipe (like Lichess): on touch screens a finger that starts on an empty square or an
+    // opponent's piece scrolls the page; the tap only counts if the finger lifts without moving.
+    // Your own pieces (squares with class "grab") still drag. "Lock board" turns this off.
+    this.boardEl.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "touch" && !self.touchLocked() && !self.fs) {
+        var i = self.squareFromPoint(e.clientX, e.clientY);
+        if (i >= 0 && !self.sqEls[i].classList.contains("grab")) { self.tapPending = { x: e.clientX, y: e.clientY, id: e.pointerId, ev: e }; return; }
+      }
+      self.onDown(e);
+    });
+    window.addEventListener("pointermove", function (e) {
+      var t = self.tapPending;
+      if (t && e.pointerId === t.id && Math.abs(e.clientX - t.x) + Math.abs(e.clientY - t.y) > 10) self.tapPending = null;
+      self.onMove(e);
+    }, { passive: false });
+    window.addEventListener("pointerup", function (e) {
+      var t = self.tapPending;
+      if (t && e.pointerId === t.id) { self.tapPending = null; self.onDown(t.ev); return; }
+      self.onUp(e);
+    });
+    window.addEventListener("pointercancel", function () { self.tapPending = null; self.cancelDrag(); });
     this.boardEl.addEventListener("contextmenu", function (e) { e.preventDefault(); self.cancelDrag(); self.clearPremoves(); });
   };
 
@@ -348,6 +372,26 @@
     if (on === !!this.fs) return;
     var self = this, r = this.root, de = document.documentElement;
     this.fs = on;
+    if (on && !this.fsBar) {
+      this.fsBar = el("div", "pb-fs-bar");
+      this.fsBar.innerHTML = '<span class="pb-fs-logo">\u265e CastleEarly</span><span class="pb-fs-title"></span><button type="button" class="pb-fs-exit">\u2715 Exit</button>';
+      this.fsBar.querySelector(".pb-fs-exit").addEventListener("click", function () { self.toggleFs(false); });
+      r.insertBefore(this.fsBar, r.firstChild);
+      // where the browser can't hide its bars (iPhone), offer the app version
+      if (window.CEInstall && window.CEInstall.available() && !(r.requestFullscreen || r.webkitRequestFullscreen)) {
+        var ib = el("button", "pb-fs-app", "\ud83d\udcf2 App");
+        ib.type = "button"; ib.title = "Install the app for a true full screen";
+        ib.addEventListener("click", function () { window.CEInstall.click(); });
+        this.fsBar.insertBefore(ib, this.fsBar.lastChild);
+      }
+    }
+    if (this.fsBar) this.fsBar.querySelector(".pb-fs-title").textContent = this.fsTitle ? this.fsTitle() : (this.kind === "puzzle" ? "Puzzle" : this.kind === "drill" ? "Practice" : "Play");
+    // keep the screen awake while playing full screen
+    try {
+      if (on && navigator.wakeLock && !this.wake) navigator.wakeLock.request("screen").then(function (w) { self.wake = w; }, function () {});
+      if (!on && this.wake) { this.wake.release(); this.wake = null; }
+    } catch (e) {}
+    if (this.onFs) this.onFs(on);
     r.classList.toggle("pb-fs", on);
     de.classList.toggle("pb-fs-lock", on);
     var fsBtns = r.querySelectorAll('[data-act="fs"]');
@@ -378,6 +422,24 @@
       if (this.fsScroll !== undefined) window.scrollTo(0, this.fsScroll);
     }
     this.render();
+  };
+
+  /* ---------- Touch lock (remembered on this device) ---------- */
+  Board.prototype.touchLocked = function () {
+    try { return localStorage.getItem("ce-board-lock") === "1"; } catch (e) { return false; }
+  };
+  Board.prototype.setTouchLock = function (on) {
+    try { localStorage.setItem("ce-board-lock", on ? "1" : "0"); } catch (e) {}
+    document.querySelectorAll(".pb").forEach(function (r) { if (r._board && r._board.paintTouch) r._board.paintTouch(); });
+  };
+  Board.prototype.paintTouch = function () {
+    if (!this.touchBar) return;
+    var on = this.touchLocked();
+    this.root.classList.toggle("pb-locked", on);
+    this.touchBar.querySelector(".pb-touch-t").textContent = on ? "\ud83d\udd12 Board locked: swipes only move pieces" : "\u2195 Easy swipe: scroll from any empty square";
+    var b = this.touchBar.querySelector(".pb-lock");
+    b.textContent = on ? "\ud83d\udd13 Unlock" : "\ud83d\udd12 Lock board";
+    b.setAttribute("aria-pressed", on ? "true" : "false");
   };
 
   Board.prototype.updateSoundBtn = function () {
@@ -1013,6 +1075,13 @@
     pq.forEach(function (m) { preSq[m.from] = preSq[m.to] = 1; });
     var checkSq = g.inCheck() ? g.kings[g.turn] : -1;
 
+    // squares your finger can drag from (touch: everywhere else scrolls the page)
+    var self0 = this, humanTurn = this.isHumanTurn(), preOk = !humanTurn && this.canPremove && this.overlay && this.canPremove();
+    var grabOk = function (i) {
+      if (self0.kind === "review") return false;
+      if (humanTurn) return self0.isOwnPiece(i);
+      return preOk && self0.isMine(b, i);
+    };
     // squares in display order
     var frag = document.createDocumentFragment();
     for (var v = 0; v < 64; v++) {
@@ -1027,6 +1096,7 @@
       if (i === checkSq) cls += " check";
       if (i === this.hintSq || (this.hintTo === i && this.hintSq >= 0)) cls += " hint";
       if (legalTargets.indexOf(i) >= 0) cls += p ? " cap" : " dot";
+      if (p && grabOk(i)) cls += " grab";
       s.className = cls;
       var html = "";
       if (row === 7) html += '<span class="pb-co f">' + FILES[i & 7] + "</span>";

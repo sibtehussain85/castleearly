@@ -349,6 +349,50 @@
     }
   }
   window.CEDrawBoards = drawBoards;
-  function go() { drawBoards(); spy(); reveal(); progress(); learnedBadges(); }
+
+  /* ---------- Install CastleEarly as an app (no browser bars) ---------- */
+  var installEvt = null;
+  function standalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true; }
+  function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
+  function iosHelp() {
+    if (document.querySelector(".ce-ios")) return;
+    var d = document.createElement("div");
+    d.className = "ce-ios"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Install CastleEarly");
+    d.innerHTML = "<p><b>Install CastleEarly on your iPhone</b></p><p>1. Tap the <b>Share</b> button (the square with an arrow) in Safari.<br>2. Tap <b>Add to Home Screen</b>.<br>3. Open CastleEarly from your home screen: it runs full screen like an app.</p><button type=\"button\">Got it</button>";
+    d.querySelector("button").addEventListener("click", function () { d.remove(); });
+    document.body.appendChild(d);
+  }
+  function installClick() {
+    if (installEvt) {
+      installEvt.prompt();
+      installEvt.userChoice.then(function () { installEvt = null; paintInstall(); }, function () {});
+    } else if (isIOS()) iosHelp();
+  }
+  function paintInstall() {
+    var show = !standalone() && (!!installEvt || isIOS());
+    document.querySelectorAll(".ce-install").forEach(function (b) { b.hidden = !show; });
+  }
+  function installButtons() {
+    var mk = function () {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "ce-install"; b.hidden = true;
+      b.textContent = "\ud83d\udcf2 Install the CastleEarly app";
+      b.addEventListener("click", installClick);
+      return b;
+    };
+    var foot = document.querySelector(".site-footer .wrap");
+    if (foot && !foot.querySelector(".ce-install")) foot.appendChild(mk());
+    var nav = document.getElementById("site-nav");
+    if (nav && !nav.querySelector(".ce-install")) { var nb = mk(); nb.classList.add("in-nav"); nav.appendChild(nb); }
+    paintInstall();
+  }
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); installEvt = e; paintInstall(); });
+  window.addEventListener("appinstalled", function () { installEvt = null; paintInstall(); });
+  window.CEInstall = { click: installClick, available: function () { return !standalone() && (!!installEvt || isIOS()); }, standalone: standalone };
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("/sw.js").catch(function () {}); });
+  }
+
+  function go() { drawBoards(); spy(); reveal(); progress(); learnedBadges(); installButtons(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
 })();

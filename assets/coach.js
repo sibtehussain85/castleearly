@@ -542,6 +542,14 @@
     this.co.panel.add({ who: "me", ply: ply, san: this.game.history()[ply], text: ex.text, book: !!book });
   };
   CoachBoard.prototype.stats = function () {};
+  // App-style full screen: the Coach's comments come along, in place of the move list
+  CoachBoard.prototype.fsTitle = function () { return "Coach \u00b7 " + this.co.label.replace(/^the /, ""); };
+  CoachBoard.prototype.onFs = function (on) {
+    var pan = this.co.panel && this.co.panel.host, side = this.root.querySelector(".pb-side"), tools = this.root.querySelector(".pb-tools");
+    if (!pan || !side) return;
+    if (on) { this.panelHome = pan.parentNode; side.insertBefore(pan, tools); this.root.classList.add("has-co"); }
+    else if (this.panelHome) { this.panelHome.appendChild(pan); this.root.classList.remove("has-co"); }
+  };
   // The coach's move: the page's opening line first, then Stockfish at the chosen strength
   CoachBoard.prototype.engineMove = function (fen, level, cb) {
     var self = this, token = this.token;
