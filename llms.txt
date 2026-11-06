@@ -2,7 +2,7 @@
 
 > CastleEarly (castleearly.com) is a free chess website for beginners and improving players. Visitors can play chess in the browser against the computer (Easy, Medium, Hard, or Master powered by Stockfish 19 lite) or a friend, analyze their Chess.com and Lichess games free with Stockfish, and learn the rules, 18 openings, the classic opening traps, 28 tactics and the basic endgames on interactive boards. No sign-up is needed.
 
-Every opening line and puzzle on the site is checked move by move with a chess engine. Lessons are written in plain English by Hussain, the site's author. CastleEarly is independent and not affiliated with Chess.com or Lichess.
+Every opening line and puzzle on the site is checked move by move with a chess engine. Lessons are written in plain English by the CastleEarly team. CastleEarly is independent and not affiliated with Chess.com or Lichess.
 
 ## Tools
 - [Play Chess Online Free vs Computer or a Friend](https://castleearly.com/): Play chess free against the computer (Easy to Master/Stockfish) or a friend, then get free Stockfish analysis of every move. No sign-up, no download.
