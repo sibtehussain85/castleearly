@@ -72,8 +72,8 @@ for (const slug of pages(only)) {
     h = h.slice(0, at) + sec + h.slice(at);
     // table of contents + link under the top board
     h = h.replace(/(<nav class="side-card side-toc"[^>]*>[\s\S]*?)(<a href="#test-yourself")/, '$1<a href="#coach">Play vs the Coach</a>$2');
-    h = h.replace('</section> <article>', `</section> <p class="coach-link"><a href="#coach">♟ Play this opening against the Coach →</a></p> <article>`);
-    if (!h.includes('class="coach-link"')) h = h.replace(/(<section class="top-board" id="top-board"[\s\S]*?<\/section>)/, `$1\n<p class="coach-link"><a href="#coach">♟ Play this opening against the Coach →</a></p>`);
+    h = h.replace('</section> <article>', `</section> <p class="coach-link"><a href="#coach">♟ Play this opening vs the Coach <small>Free · every move explained</small></a></p> <article>`);
+    if (!h.includes('class="coach-link"')) h = h.replace(/(<section class="top-board" id="top-board"[\s\S]*?<\/section>)/, `$1\n<p class="coach-link"><a href="#coach">♟ Play this opening vs the Coach <small>Free · every move explained</small></a></p>`);
   }
   fs.writeFileSync(file, h);
   n++;
