@@ -57,7 +57,7 @@ function schema(p, url, TODAY) {
     '@context': 'https://schema.org', '@type': 'Article', headline: p.ogTitle, description: p.desc,
     image: `https://castleearly.com/assets/og/${p.sec || 'openings'}-${p.slug}.jpg`,
     datePublished: TODAY, dateModified: TODAY,
-    author: { '@type': 'Person', name: 'Hussain', url: 'https://castleearly.com/about/' },
+    author: { '@type': 'Organization', name: 'CastleEarly', url: 'https://castleearly.com/' },
     publisher: { '@type': 'Organization', name: 'CastleEarly', url: 'https://castleearly.com/' },
     mainEntityOfPage: url,
   };
@@ -110,7 +110,7 @@ ${sc.main}
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${L.esc(p.title)} – CastleEarly">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="author" content="Hussain">
+<meta name="author" content="CastleEarly">
 <meta property="article:published_time" content="${TODAY}">
 <meta property="article:modified_time" content="${TODAY}">
 <script type="application/ld+json">
@@ -120,7 +120,7 @@ ${sc.faq}
 </head>
 `;
   const hp = L.pos(p.hero.line);
-  const hero = `<main class="wrap has-hero"><div class="page-hero has-board"><div class="page-hero-in"><div class="ph-text"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <a href="/${p.sec || 'openings'}/">${p.sec === 'learn' ? 'Learn' : 'Openings'}</a> › ${L.esc(p.name)}</nav><p class="eyebrow">${L.esc(p.eyebrow)}</p><h1>${L.esc(p.h1)}</h1><div class="meta-row"><span>By <a href="/about/">Hussain</a></span><span>Updated ${dateLabel}</span><span>${p.readMin} min read</span></div><p>${L.esc(p.intro)}</p></div><figure class="ph-board"><div class="mini-board" data-fen="${L.boardFen(hp.fen)}" data-hl="${hp.hl}" data-flip="${p.hero.flip}" aria-hidden="true"></div><figcaption>${L.esc(p.hero.cap)}</figcaption></figure></div></div>`;
+  const hero = `<main class="wrap has-hero"><div class="page-hero has-board"><div class="page-hero-in"><div class="ph-text"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <a href="/${p.sec || 'openings'}/">${p.sec === 'learn' ? 'Learn' : 'Openings'}</a> › ${L.esc(p.name)}</nav><p class="eyebrow">${L.esc(p.eyebrow)}</p><h1>${L.esc(p.h1)}</h1><div class="meta-row"><span>By <a href="/about/">CastleEarly</a></span><span>Updated ${dateLabel}</span><span>${p.readMin} min read</span></div><p>${L.esc(p.intro)}</p></div><figure class="ph-board"><div class="mini-board" data-fen="${L.boardFen(hp.fen)}" data-hl="${hp.hl}" data-flip="${p.hero.flip}" aria-hidden="true"></div><figcaption>${L.esc(p.hero.cap)}</figcaption></figure></div></div>`;
 
   // Body blocks: strings are prose (the first one sits directly under the head like the shell does), objects are trainers.
   let body = `<article><div class="with-side"><div class="art-main">\n<div class="article-head prose" data-head="1">\n${p.head()}\n</div>\n`;
