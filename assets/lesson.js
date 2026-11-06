@@ -221,7 +221,39 @@
     if (learned().indexOf(data.slug) >= 0) markLearned(data.slug);
   }
 
+  /* ---------- Coach: load the play board, Stockfish link and coach only when asked ---------- */
+  var SRC = (document.currentScript && document.currentScript.src) || "";
+  var VER = (SRC.match(/\?.*$/) || [""])[0];
+  function loadScript(name, cb) {
+    if (document.querySelector('script[data-ce="' + name + '"]')) return cb();
+    var s = document.createElement("script");
+    s.src = "/assets/" + name + VER; s.setAttribute("data-ce", name);
+    s.onload = function () { cb(); };
+    s.onerror = function () { cb("fail"); };
+    document.head.appendChild(s);
+  }
+  function coach() {
+    document.querySelectorAll(".coach-start").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var host = document.getElementById(btn.getAttribute("data-for"));
+        if (!host) return;
+        btn.disabled = true; btn.textContent = "Loading the coach\u2026";
+        var steps = ["engine.js", "play.js", "coach.js"], i = 0;
+        (function next(err) {
+          if (err) { btn.disabled = false; btn.textContent = "Couldn't load. Try again"; return; }
+          if (i < steps.length) return loadScript(steps[i++], next);
+          var intro = btn.closest(".coach-intro");
+          if (intro) intro.hidden = true;
+          host.hidden = false;
+          window.CECoach.start(host);
+          host.scrollIntoView({ block: "start", behavior: "smooth" });
+        })();
+      });
+    });
+  }
+
   function go() {
+    coach();
     var lq = document.querySelector(".lq script[type='application/json']");
     if (lq) { try { FLIP = JSON.parse(lq.textContent).flip === 1; } catch (e) {} }
     story(); checks(); quiz();

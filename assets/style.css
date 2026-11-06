@@ -1098,3 +1098,49 @@ html { scroll-padding-top: 76px; }
   .top-board { margin-top: 14px; }
   .top-board .trainer:has(> script) { min-height: calc(100vw + 250px); }
 }
+
+/* ---------- Coach (play an opening vs Stockfish with move-by-move notes) ---------- */
+.coach-sec { margin: 34px 0; }
+.coach-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.coach-intro { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; }
+.coach-intro p { margin: 0; flex: 1 1 260px; color: var(--ink-soft); }
+.coach-start { font-size: 1rem; }
+.co-setup { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 14px; }
+.co-grid { display: grid; gap: 16px; }
+.co-panel { border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+.co-head { display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.co-avatar { font-size: 1.5rem; line-height: 1; }
+.co-sum { color: var(--ink-soft); font-size: .88rem; }
+.co-list { list-style: none; margin: 0; padding: 8px; max-height: 440px; overflow-y: auto; display: grid; gap: 8px; }
+.co-it { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: .94rem; }
+.co-it.me { border-left-color: #8a8478; }
+.co-it p { margin: 0; }
+.co-h { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px !important; }
+.co-t { line-height: 1.5; }
+.co-t.wait, .co-ai-out.wait { color: var(--ink-soft); font-style: italic; }
+.co-badge { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 5px; border-radius: 7px; font-weight: 800; font-size: .8rem; color: #fff; background: #8a8478; }
+.co-badge.wait { background: var(--line); color: var(--ink-soft); }
+.co-lab { font-size: .8rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--paper-2); }
+.co-badge.book { background: #a5824f; } .co-lab.book { color: #8a6116; }
+.co-badge.great { background: #2f7fc1; } .co-lab.great { color: #2f7fc1; }
+.co-badge.best, .co-badge.excellent { background: #3d9a5b; } .co-lab.best, .co-lab.excellent { color: var(--good); }
+.co-badge.good { background: #7aa66b; } .co-lab.good { color: var(--good); }
+.co-badge.inacc { background: #d6a52a; } .co-lab.inacc { color: #a77d10; }
+.co-badge.mistake { background: #e07a2f; } .co-lab.mistake { color: #c25f17; }
+.co-badge.blunder { background: #cf3b31; } .co-lab.blunder { color: var(--bad); }
+.co-it.inacc { border-left-color: #d6a52a; } .co-it.mistake { border-left-color: #e07a2f; } .co-it.blunder { border-left-color: #cf3b31; background: var(--bad-bg); }
+.co-it.great, .co-it.best, .co-it.excellent { border-left-color: #3d9a5b; } .co-it.book { border-left-color: #a5824f; } .co-it.good { border-left-color: #7aa66b; }
+.co-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; margin-top: 8px; }
+.co-show, .co-more, .co-ask button { font: inherit; font-size: .85rem; font-weight: 700; padding: 6px 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; }
+.co-show:hover, .co-more:hover, .co-ask button:hover { border-color: var(--accent); color: var(--accent); }
+.co-ai { display: grid; gap: 8px; flex: 1 1 100%; }
+.co-more { justify-self: start; }
+.co-ask { display: flex; gap: 6px; }
+.co-ask input { flex: 1; min-width: 0; font: inherit; font-size: .88rem; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.co-ai-out { background: var(--info-bg); border-radius: 8px; padding: 9px 11px; line-height: 1.5; }
+.co-ai-out.err { background: var(--bad-bg); }
+.co-note { font-size: .8rem; color: var(--ink-soft); margin: 10px 0 0; }
+.pz-coach { margin-top: 12px; display: grid; gap: 8px; }
+.pz-coach:empty { display: none; }
+.pz-coach .co-t { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: .94rem; }
+.coach-link { margin: 10px 0 0; font-weight: 600; }
