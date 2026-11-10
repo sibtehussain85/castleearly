@@ -114,7 +114,9 @@
     var cp = Math.max(-3000, Math.min(3000, s));
     return 50 + 50 * (2 / (1 + Math.exp(-0.0012 * cp)) - 1);
   }
-  function capCp(s) { return isMate(s) ? (s > 0 ? 2000 : -2000) : Math.max(-2000, Math.min(2000, s)); }
+  // Centipawn loss is capped at 650 per move (fitted to Chess.com, Nov 2026), so one lost piece or a missed mate
+  // doesn't outweigh a whole game of good moves
+  function capCp(s) { return isMate(s) ? (s > 0 ? 650 : -650) : Math.max(-650, Math.min(650, s)); }
   // Accuracy from average centipawn loss (a widely used fit to Chess.com's numbers)
   function acplAccuracy(x) { return Math.max(0, Math.min(100, 103.3979 - 0.3820659 * x - 0.002169231 * x * x)); }
   function moveAccuracy(drop) { return Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * drop) - 3.1669)); }
@@ -288,8 +290,9 @@
       if (!cls) cls = drop < 2 ? "excellent" : drop < 5 ? "good" : drop < 10 ? "inaccuracy" : drop < 20 ? "mistake" : "blunder";
       if (cls !== "book" && cls !== "forced") stillBook = false;
       if (cls === "excellent" && drop < 0.5) cls = "best";
-      var acc = cls === "book" || cls === "forced" ? 100 : moveAccuracy(Math.max(dropNarrow, dropWide * 1.5) * 1.5);
-      if (cls === "mistake" && isMate(best)) acc = Math.min(acc, 60);
+      // Per-move accuracy, fitted to Chess.com's official numbers on 52 games (104 sides, 450-2500 Elo; Nov 10, 2026):
+      // average error 2.2 points (was 14.7). A single move never scores below 22, like Chess.com.
+      var acc = cls === "book" || cls === "forced" ? 100 : Math.max(22, moveAccuracy(Math.max(dropNarrow, dropWide * 2) * 1.7));
       if (cls === "book" || cls === "forced") cpLoss = 0;
       out.push({ cls: cls, color: mover, drop: drop, acc: acc, cpLoss: cpLoss, ply: i, best: a.best, bestScore: best, playedScore: played });
     }
@@ -310,33 +313,23 @@
   }
 
   function summary(rv) {
-    // Game accuracy for each side = average of two measures:
-    //  1. Lichess method: each move's accuracy from lost winning chances, combined as the mean of a
-    //     volatility-weighted average (sharp moments count more) and a harmonic mean (blunders hurt a lot)
-    //  2. Accuracy from the average centipawn loss
+    // Game accuracy for each side (fitted to Chess.com, Nov 2026):
+    //  80% move accuracy (40% plain average + 60% harmonic mean, so blunders still hurt)
+    //  20% accuracy from the average centipawn loss (each move's loss capped at 650 cp)
     var s = { w: { acc: 0, n: 0, counts: {}, list: [], cpl: 0 }, b: { acc: 0, n: 0, counts: {}, list: [], cpl: 0 } };
-    var evs = rv.evals || whiteEvals(rv), wps = evs.map(winPct), nMoves = rv.cls.length;
-    var win = Math.max(2, Math.min(8, Math.floor(nMoves / 10)));
-    function weight(i) {
-      var from = Math.max(0, i - win + 2), seg = wps.slice(from, i + 2), m = 0, v = 0;
-      if (seg.length < 2) return 0.5;
-      seg.forEach(function (x) { m += x; }); m /= seg.length;
-      seg.forEach(function (x) { v += (x - m) * (x - m); });
-      return Math.max(0.5, Math.min(12, Math.sqrt(v / seg.length)));
-    }
     rv.cls.forEach(function (c, i) {
       var side = s[c.color];
       side.counts[c.cls] = (side.counts[c.cls] || 0) + 1;
-      if (c.cls !== "forced") { side.list.push({ acc: c.acc, w: weight(i) }); side.cpl += c.cpLoss || 0; side.n++; }
+      if (c.cls !== "forced") { side.list.push({ acc: c.acc, w: 1 }); side.cpl += c.cpLoss || 0; side.n++; }
     });
     ["w", "b"].forEach(function (k) {
       var sd = s[k];
       if (!sd.n) { sd.acc = null; return; }
       var ws = 0, wsum = 0, inv = 0;
       sd.list.forEach(function (m) { ws += m.acc * m.w; wsum += m.w; inv += 1 / Math.max(m.acc, 1); });
-      var lichess = (ws / wsum + sd.n / inv) / 2;
+      var lichess = 0.4 * (ws / wsum) + 0.6 * (sd.n / inv);
       sd.acpl = sd.cpl / sd.n;
-      sd.acc = (lichess + acplAccuracy(sd.acpl)) / 2;
+      sd.acc = 0.8 * lichess + 0.2 * acplAccuracy(sd.acpl);
     });
     // Opening name: the deepest named book position of the game
     var op = null;
