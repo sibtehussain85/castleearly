@@ -1,6 +1,13 @@
 /assets/*
   Cache-Control: public, max-age=604800
 /assets/stockfish/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/assets/*.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/assets/*.css
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 /assets/stockfish/*.wasm
   Content-Type: application/wasm
@@ -11,3 +18,5 @@
   Cache-Control: no-cache
 /site.webmanifest
   Cache-Control: public, max-age=3600
+/assets/stockfish/*.txt
+  X-Robots-Tag: noindex

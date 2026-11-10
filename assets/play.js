@@ -901,20 +901,27 @@
 
   /* ---------- Game review (review.js is only downloaded when someone asks for a review) ---------- */
   var REVIEW_URL = scriptSrc.replace(/play\.js(\?.*)?$/, "review.js") + VER, reviewLoading = null;
+  // Download review.js (once). Also called when a game ends, so the analysis opens instantly
+  // when asked for (a layout change arriving late would count as the page "jumping").
+  function loadReview() {
+    if (Board.prototype.startReview || reviewLoading) return;
+    reviewLoading = [];
+    var s = document.createElement("script");
+    s.src = REVIEW_URL;
+    s.onload = function () { var q = reviewLoading; reviewLoading = null; q.forEach(function (f) { f(true); }); };
+    s.onerror = function () { var q = reviewLoading; reviewLoading = null; if (s.parentNode) s.parentNode.removeChild(s); q.forEach(function (f) { f(false); }); };
+    document.head.appendChild(s);
+  }
   Board.prototype.openReview = function () {
     var self = this;
     if (this.review || this.game.stack.length < 1) return;
     if (Board.prototype.startReview) { this.startReview(); return; }
-    if (!reviewLoading) {
-      reviewLoading = [];
-      var s = document.createElement("script");
-      s.src = REVIEW_URL;
-      s.onload = function () { var q = reviewLoading; reviewLoading = null; q.forEach(function (f) { f(); }); };
-      s.onerror = function () { reviewLoading = null; self.message = { cls: "bad", text: "The analysis could not load. Check your connection and try again." }; self.render(); };
-      document.head.appendChild(s);
-    }
+    loadReview();
     this.statusEl.textContent = "Loading the analysis\u2026";
-    reviewLoading.push(function () { if (self.startReview) self.startReview(); });
+    reviewLoading.push(function (ok) {
+      if (ok && self.startReview) self.startReview();
+      else if (!ok) { self.message = { cls: "bad", text: "The analysis could not load. Check your connection and try again." }; self.render(); }
+    });
   };
 
   // Load a finished game (e.g. imported from Chess.com or Lichess) and analyze it.
@@ -967,7 +974,7 @@
     this.overlay.querySelector('[data-o="again"]').addEventListener("click", function () { self.newGame(); });
     this.overlay.querySelector('[data-o="look"]').addEventListener("click", function () { self.hideOverlay(); });
     var rb = this.overlay.querySelector('[data-o="review"]');
-    if (rb) rb.addEventListener("click", function () { self.openReview(); });
+    if (rb) { rb.addEventListener("click", function () { self.openReview(); }); loadReview(); }
     setTimeout(function () { self.overlay.hidden = false; }, 450);
   };
   Board.prototype.hideOverlay = function () { this.overlay.hidden = true; this.overlay.innerHTML = ""; };

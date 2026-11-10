@@ -514,6 +514,15 @@ html { overflow-x: clip; }
 .rv-nav { display: flex; gap: 8px; }
 .rv-nav .pb-btn { flex: 1; }
 .rv-note { margin: 0; font-size: .78rem; color: var(--ink-soft); }
+.rv-summary { min-height: 144px; }
+.rv-skel .rv-acc-num, .rv-skel .rv-opening, .rv-counts-ph { color: var(--ink-soft); }
+.rv-skel { opacity: .55; }
+.rv-skel .rv-acc-num { animation: rvPulse 1.4s ease-in-out infinite; }
+.rv-skel svg { cursor: default; }
+.rv-counts-ph { display: block; text-align: center; font-weight: 700; line-height: 1.25; }
+.rv-progress.done .rv-bar span { background: var(--ink-soft); opacity: .45; }
+@keyframes rvPulse { 50% { opacity: .5; } }
+@media (prefers-reduced-motion: reduce) { .rv-skel .rv-acc-num { animation: none; } }
 @media (max-width: 520px) {
   .pb-reviewing .pb-left { grid-template-columns: 14px minmax(0, 1fr); column-gap: 6px; }
   .rv-eval-n { display: none; }

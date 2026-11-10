@@ -505,8 +505,12 @@
       '<div class="rv-head"><h3>Game analysis</h3><button type="button" class="rv-x" data-rv="close" aria-label="Close analysis">\u2715</button></div>' +
       '<div class="rv-engine"></div>' +
       '<div class="rv-progress"><div class="rv-bar"><span></span></div><p>Loading Stockfish 19 lite\u2026</p></div>' +
-      '<div class="rv-summary" hidden></div>' +
-      '<div class="rv-graph" hidden></div>' +
+      // Summary and graph keep their final size from the start (placeholders), so nothing jumps when the results arrive
+      '<div class="rv-summary rv-skel"><div class="rv-acc"><div><span class="rv-acc-name">White</span><span class="rv-acc-num w">\u2026</span></div>' +
+      '<span class="rv-acc-lbl">Accuracy</span><div><span class="rv-acc-name">Black</span><span class="rv-acc-num b">\u2026</span></div></div>' +
+      '<p class="rv-opening">Opening: \u2026</p><div class="rv-counts"><span class="rv-counts-ph">Move breakdown</span></div></div>' +
+      '<div class="rv-graph rv-skel"><svg viewBox="0 0 300 72" preserveAspectRatio="none" aria-hidden="true"><rect width="300" height="72" class="rv-g-bg"/>' +
+      '<line x1="0" x2="300" y1="36" y2="36" class="rv-g-mid"/></svg></div>' +
       '<div class="rv-coach" aria-live="polite"></div>' +
       '<div class="rv-moves"></div>' +
       '<div class="rv-nav rv-steps">' +
@@ -738,7 +742,10 @@
     rv.cls = classify(rv);
     rv.evals = whiteEvals(rv);
     rv.sum = summary(rv);
-    this.reviewEl.querySelector(".rv-progress").hidden = true;
+    // keep the progress line in place (marked done) instead of removing it, so the panel doesn't move
+    this.reviewEl.querySelector(".rv-bar span").style.width = "100%";
+    this.reviewEl.querySelector(".rv-progress").classList.add("done");
+    this.reviewEl.querySelector(".rv-progress p").textContent = "\u2713 Analysis complete" + (rv.engine === "sf" ? " \u00b7 Stockfish 19 lite" : "");
 
     // summary: accuracy + counts for each side
     var s = rv.sum, comp = this.isComputerGame();
@@ -749,6 +756,7 @@
       return '<tr><td class="n">' + (s.w.counts[k] || 0) + '</td><td><span class="rv-dot sm" style="background:' + CLS[k].col + '">' + CLS[k].sym + "</span>" + CLS[k].label + '</td><td class="n">' + (s.b.counts[k] || 0) + "</td></tr>";
     }).join("");
     var sumEl = this.reviewEl.querySelector(".rv-summary");
+    sumEl.classList.remove("rv-skel");
     sumEl.innerHTML =
       '<div class="rv-acc"><div><span class="rv-acc-name">' + nameW + '</span><span class="rv-acc-num w">' + accTxt(s.w.acc) + '</span></div>' +
       '<span class="rv-acc-lbl">Accuracy</span>' +
@@ -767,6 +775,7 @@
       return '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.2" fill="' + CLS[c.cls].col + '" stroke="#fff" stroke-width="1"/>';
     }).join("");
     var gEl = this.reviewEl.querySelector(".rv-graph");
+    gEl.classList.remove("rv-skel");
     gEl.innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img" aria-label="Advantage graph. Click to jump to a move.">' +
       '<rect width="' + W + '" height="' + H + '" class="rv-g-bg"/><path d="' + area + '" class="rv-g-w"/>' +
       '<line x1="0" x2="' + W + '" y1="' + H / 2 + '" y2="' + H / 2 + '" class="rv-g-mid"/>' +
