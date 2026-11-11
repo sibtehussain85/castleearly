@@ -42,7 +42,7 @@ Every opening line and puzzle on the site is checked move by move with a chess e
 - [Vienna Game: Moves and Plans for Beginners](https://castleearly.com/openings/vienna-game/): Learn the Vienna Game (1.e4 e5 2.Nc3) and the Vienna Gambit move by move, with plans for both sides, common mistakes and a free practice board.
 
 ## Opening traps
-- [Scholar's Mate: How to Do It and Stop It](https://castleearly.com/openings/scholars-mate/): Scholar's Mate is the 4-move checkmate: 1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6?? 4.Qxf7#. See how it works, every move order, and the simple defense with ...g6.
+- [Scholar's Mate (4-Move Checkmate): How to Do It and Stop It](https://castleearly.com/openings/scholars-mate/): Scholar's Mate is the 4-move checkmate: 1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6?? 4.Qxf7#. Learn every move order, how to stop it with ...g6, and how to punish the early queen (...Nd4!), plus Scholar's Mate for Black.
 - [Fool's Mate: the Fastest Checkmate in Chess](https://castleearly.com/openings/fools-mate/): Fool's Mate is the fastest checkmate in chess: 1.f3 e5 2.g4?? Qh4#. See why it works, every version of it, and the simple rule that keeps you safe.
 - [Englund Gambit: the Trap and How to Beat It](https://castleearly.com/openings/englund-gambit/): Learn the Englund Gambit (1.d4 e5) move by move: the famous ...Qc1# trap, how White should answer, whether it is any good, and a free practice board.
 - [Stafford Gambit: Traps and How to Refute It](https://castleearly.com/openings/stafford-gambit/): Learn the Stafford Gambit (1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6) move by move: its two deadliest traps, how White should refute it, and a free practice board.
