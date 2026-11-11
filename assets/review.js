@@ -65,9 +65,10 @@
     forced:     { label: "Only move",  sym: "\u25a1",  col: "#858b96" },
     inaccuracy: { label: "Inaccuracy", sym: "?!", col: "#d9a521" },
     mistake:    { label: "Mistake",    sym: "?",  col: "#e07b2e" },
+    miss:       { label: "Missed chance", sym: "\u25cb", col: "#b05a9a" },
     blunder:    { label: "Blunder",    sym: "??", col: "#cf3b31" }
   };
-  var ORDER = ["brilliant", "best", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "blunder"];
+  var ORDER = ["brilliant", "best", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "miss", "blunder"];
 
   /* ---------- Opening book ---------- */
   var BOOK = null, NAMES = null;
@@ -277,6 +278,13 @@
       var dropNarrow = Math.max(0, wpBest - wpPlayed);
       var dropWide = Math.max(0, winPctWide(best) - winPctWide(played));
       var drop = Math.max(dropNarrow, dropWide);
+      // Labels use the normal win-chance curve only (the wide curve is kept for accuracy). Using the bigger of
+      // the two made too many Mistakes look like Blunders (Hussain, Nov 12, 2026).
+      var dropLabel = dropNarrow;
+      // "Missed chance": the opponent's last move handed over a big chance (>= 10 win-chance points) and this
+      // move let it go without making things worse than before that mistake, so it isn't a Mistake or Blunder.
+      var prev = i > 0 ? -rv.res[i - 1].score : null;
+      var missed = prev != null && !isMate(prev) && winPct(best) - winPct(prev) >= 10 && winPct(prev) - wpPlayed < 5;
       var cpLoss = Math.max(0, capCp(best) - capCp(played));
       var isBest = uci === a.best || played >= best - 5;
       var cls = null;
@@ -287,9 +295,10 @@
         if (isSacrifice(fen, uci) && (isMate(played) ? played > 0 && mateIn(played) >= 2 : wpPlayed >= 45 && wpBest < 97)) cls = "brilliant";
       }
       else if (isMate(best) && best > 0 && !(isMate(played) && played > 0)) cls = mateIn(best) <= 1 ? "mistake" : mateIn(best) <= 3 && drop < 10 ? "inaccuracy" : null;
-      if (!cls) cls = drop < 2 ? "excellent" : drop < 5 ? "good" : drop < 10 ? "inaccuracy" : drop < 20 ? "mistake" : "blunder";
+      if (!cls && missed && dropLabel >= 10) cls = "miss";
+      if (!cls) cls = dropLabel < 2 ? "excellent" : dropLabel < 5 ? "good" : dropLabel < 10 ? "inaccuracy" : dropLabel < 20 ? "mistake" : "blunder";
       if (cls !== "book" && cls !== "forced") stillBook = false;
-      if (cls === "excellent" && drop < 0.5) cls = "best";
+      if (cls === "excellent" && dropLabel < 0.5) cls = "best";
       // Per-move accuracy, fitted to Chess.com's official numbers on 52 games (104 sides, 450-2500 Elo; Nov 10, 2026):
       // average error 2.2 points (was 14.7). A single move never scores below 22, like Chess.com.
       var acc = cls === "book" || cls === "forced" ? 100 : Math.max(22, moveAccuracy(Math.max(dropNarrow, dropWide * 2) * 1.7));
@@ -375,6 +384,11 @@
       case "good": return B + " is a decent move. " + esc(bestSan) + " was a little stronger.";
     }
     // Inaccuracy, mistake, blunder: explain what went wrong
+    if (c.cls === "miss") {
+      var gain = c.best && capturedBy(fen, c.best);
+      return B + " is a missed chance. The move before it, by " + opp + ", left an opening, and <b>" + esc(bestSan) + "</b> would have " +
+        (gain ? "won " + (gain === "q" ? "the queen" : "a " + PIECE[gain]) : "taken advantage of it") + ". " + cap(who) + " didn't lose ground, but the chance is gone.";
+    }
     var label = { inaccuracy: "an inaccuracy", mistake: "a mistake", blunder: "a blunder" }[c.cls];
     var why = "";
     if (isMate(c.bestScore) && c.bestScore > 0 && !(isMate(c.playedScore) && c.playedScore > 0)) {
