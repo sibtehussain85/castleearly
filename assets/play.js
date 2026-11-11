@@ -933,6 +933,7 @@
     this.game = new Chess(this.startFen);
     for (var i = 0; i < g.moves.length; i++) if (!this.game.move(g.moves[i])) break;
     this.names = g.names || null;
+    this.gameElo = g.elo || null; // players' ratings of an imported game (used by the review's move labels)
     this.flipped = !!g.flip; this.myColor = g.flip ? "b" : "w";
     this.over = { title: "", sub: "", result: g.result || "" };
     this.selected = -1; this.hintSq = -1; this.thinking = false; this.message = ""; this.premoves = []; this.prePending = false;

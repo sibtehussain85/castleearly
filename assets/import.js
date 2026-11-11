@@ -253,7 +253,8 @@
     var link = $("#an-board-link");
     if (g.url) { link.href = g.url; link.textContent = "View on " + SITE_NAME[g.site]; link.hidden = false; } else link.hidden = true;
     b.onBack = function () { if (b.review) b.endReview(true); boardSec.hidden = true; var t = gamesSec.hidden ? form : gamesSec; t.scrollIntoView({ behavior: "smooth", block: "start" }); };
-    b.loadGame({ fen: parsed.fen, moves: parsed.moves, names: { w: label(g.white), b: label(g.black) }, flip: flipForUser, result: g.result });
+    b.loadGame({ fen: parsed.fen, moves: parsed.moves, names: { w: label(g.white), b: label(g.black) }, flip: flipForUser, result: g.result,
+      elo: { w: parseInt(g.white.rating, 10) || 0, b: parseInt(g.black.rating, 10) || 0, site: g.site || "" } });
     boardSec.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   listEl.addEventListener("click", function (e) {

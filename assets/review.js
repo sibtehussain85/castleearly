@@ -108,6 +108,24 @@
     var cp = Math.max(-1000, Math.min(1000, s));
     return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
   }
+  // Move labels follow the players' ratings, like Chess.com's expected points: lower-rated players convert an
+  // advantage less reliably, so the same engine swing costs them fewer winning chances. Measured on ~4,550 analysed
+  // Lichess blitz/rapid games (Nov 12, 2026): k = 0.0007 + 0.00000095 * Lichess rating (Lichess's own curve,
+  // 0.00368, comes from 2300+ players). We use half of that adjustment until it is checked against Chess.com counts.
+  // Chess.com ratings are converted to the Lichess scale first (Chess.com runs lower below ~2200).
+  var K_LICHESS = 0.00368208;
+  function labelK(rating, site) {
+    var r = parseInt(rating, 10);
+    if (!r || r < 100) return K_LICHESS;
+    var li = site === "lichess" ? r : (r < 2300 ? 0.7 * r + 700 : r);
+    var kEmp = Math.max(0.0012, Math.min(K_LICHESS, 0.0007 + 0.00000095 * li));
+    return (K_LICHESS + kEmp) / 2;
+  }
+  function winPctK(s, k) {
+    if (isMate(s)) return s > 0 ? 100 : 0;
+    var cp = Math.max(-1000, Math.min(1000, s));
+    return 50 + 50 * (2 / (1 + Math.exp(-k * cp)) - 1);
+  }
   // A gentler curve that keeps counting when one side is already far ahead, so throwing away
   // even more material in a lost position still shows up (Chess.com punishes that too).
   function winPctWide(s) {
@@ -280,11 +298,12 @@
       var drop = Math.max(dropNarrow, dropWide);
       // Labels use the normal win-chance curve only (the wide curve is kept for accuracy). Using the bigger of
       // the two made too many Mistakes look like Blunders (Hussain, Nov 12, 2026).
-      var dropLabel = dropNarrow;
+      var kL = labelK(rv.elo && rv.elo[mover], rv.elo && rv.elo.site);
+      var dropLabel = Math.max(0, winPctK(best, kL) - winPctK(played, kL));
       // "Missed chance": the opponent's last move handed over a big chance (>= 10 win-chance points) and this
       // move let it go without making things worse than before that mistake, so it isn't a Mistake or Blunder.
       var prev = i > 0 ? -rv.res[i - 1].score : null;
-      var missed = prev != null && !isMate(prev) && winPct(best) - winPct(prev) >= 10 && winPct(prev) - wpPlayed < 5;
+      var missed = prev != null && !isMate(prev) && winPctK(best, kL) - winPctK(prev, kL) >= 10 && winPctK(prev, kL) - winPctK(played, kL) < 5;
       var cpLoss = Math.max(0, capCp(best) - capCp(played));
       var isBest = uci === a.best || played >= best - 5;
       var cls = null;
@@ -436,7 +455,7 @@
     moves.forEach(function (u) { c.move(u); fens.push(c.fen()); });
     var key = this.startFen + "|" + moves.join(" ");
     this.realGame = g;
-    var rv = this.review = { key: key, moves: moves, fens: fens, sans: g.history(), ply: moves.length, res: [], done: 0, cls: null, engine: Board._sfDown ? "ce" : "sf", sfReason: Board._sfDown || "" };
+    var rv = this.review = { key: key, moves: moves, fens: fens, sans: g.history(), ply: moves.length, res: [], done: 0, cls: null, engine: Board._sfDown ? "ce" : "sf", sfReason: Board._sfDown || "", elo: this.gameElo || null };
     if (this.reviewCache && this.reviewCache.key === key) { rv.res = this.reviewCache.res; rv.engine = this.reviewCache.engine; rv.sfReason = this.reviewCache.sfReason; rv.done = moves.length + 1; }
     this.root.classList.add("pb-reviewing");
     this.buildReviewUI();
