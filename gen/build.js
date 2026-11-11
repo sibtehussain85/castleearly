@@ -52,11 +52,11 @@ async function buildQuiz(p) {
   return Object.assign({ slug: p.slug, side: p.quiz.side, flip: p.quiz.flip }, p.quiz.ask ? { ask: p.quiz.ask } : {}, { questions: out });
 }
 
-function schema(p, url, TODAY) {
+function schema(p, url, TODAY, MOD) {
   const article = {
     '@context': 'https://schema.org', '@type': 'Article', headline: p.ogTitle, description: p.desc,
     image: `https://castleearly.com/assets/og/${p.sec || 'openings'}-${p.slug}.jpg`,
-    datePublished: TODAY, dateModified: TODAY,
+    datePublished: TODAY, dateModified: MOD || TODAY,
     author: { '@type': 'Organization', name: 'CastleEarly', url: 'https://castleearly.com/' },
     publisher: { '@type': 'Organization', name: 'CastleEarly', url: 'https://castleearly.com/' },
     mainEntityOfPage: url,
@@ -74,10 +74,12 @@ async function buildPage(p) {
   console.log('Building ' + p.slug);
   // Pages may carry their own publish date (p.date, YYYY-MM-DD); older pages keep the original date.
   const TODAY = p.date || DEFAULT_DATE;
+  // p.updated (YYYY-MM-DD): last big content change; drives "Updated" and dateModified, keeps datePublished.
+  const MOD = p.updated || TODAY;
   const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const dateLabel = `${MONTHS[+TODAY.slice(5, 7) - 1]} ${+TODAY.slice(8, 10)}, ${TODAY.slice(0, 4)}`;
+  const dateLabel = `${MONTHS[+MOD.slice(5, 7) - 1]} ${+MOD.slice(8, 10)}, ${MOD.slice(0, 4)}`;
   const url = `https://castleearly.com/${p.sec || 'openings'}/${p.slug}/`;
-  const sc = schema(p, url, TODAY);
+  const sc = schema(p, url, TODAY, MOD);
   const head = `<!DOCTYPE html>
 
 <html lang="en" data-default-theme="light">
@@ -112,7 +114,7 @@ ${sc.main}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="author" content="CastleEarly">
 <meta property="article:published_time" content="${TODAY}">
-<meta property="article:modified_time" content="${TODAY}">
+<meta property="article:modified_time" content="${MOD}">
 <script type="application/ld+json">
 ${sc.faq}
 </script>

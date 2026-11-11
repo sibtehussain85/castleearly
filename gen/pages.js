@@ -4,6 +4,10 @@ const { mv, story, quickCheck, trainer, ideas, keyFacts } = require('./lib');
 const SCH = 'e4 e5 Bc4 Nc6 Qh5 Nf6 Qxf7#';
 const SCH2 = 'e4 e5 Qh5 Nc6 Bc4 Nf6 Qxf7#';
 const SCHDEF = 'e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6';
+const SCHPUN = 'e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6 Qb3 Nd4 Bxf7+ Ke7 Qc4 b5';
+const SCHG4 = 'e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6 g4 Nd4';
+const BSCH = 'e4 e5 Bc4 Bc5 Nc3 Qh4 Nf3 Qxf2#';
+const QUICK3 = 'e4 g5 d4 f6 Qh5#';
 const FOOL = 'f3 e5 g4 Qh4#';
 const ENG = 'd4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Qxc3 Qc1#';
 const ENGW = 'd4 e5 dxe5 Nc6 Nf3 Qe7 Nc3 Nxe5 e4';
@@ -17,13 +21,14 @@ module.exports = [
 {
   slug: 'scholars-mate',
   name: "Scholar's Mate",
-  title: "Scholar's Mate: How to Do It and Stop It",
-  desc: "Scholar's Mate is the 4-move checkmate: 1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6?? 4.Qxf7#. See how it works, every move order, and the simple defense with ...g6.",
+  title: "Scholar's Mate (4-Move Checkmate): How to Do It and Stop It",
+  desc: "Scholar's Mate is the 4-move checkmate: 1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6?? 4.Qxf7#. Learn every move order, how to stop it with ...g6, and how to punish the early queen.",
+  updated: '2026-11-11',
   ogTitle: "Scholar's Mate: the 4-Move Checkmate and How to Stop It",
   h1: "Scholar's Mate: the 4-move checkmate and how to stop it",
   ogLines: ["Scholar's Mate:", 'the 4-move checkmate'],
   eyebrow: 'Opening trap · 4-move checkmate',
-  readMin: 6,
+  readMin: 9,
   flip: 1,
   hero: { line: SCH, flip: 0, cap: "1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6?? 4.Qxf7#" },
   intro: "Scholar's Mate is the four-move checkmate almost every chess player runs into in their first games. White's queen and bishop team up against the f7 pawn, and if Black doesn't notice, it's checkmate on move 4. Here's exactly how it works and, more importantly, how to stop it every time.",
@@ -33,6 +38,7 @@ ${keyFacts([
   ['Target', 'The f7 pawn, defended only by the king'],
   ['Length', 'Checkmate on move 4'],
   ['Best defense', `${mv('e4 e5 Bc4 Nc6 Qh5 g6', '3...g6')}, then ...Nf6 when the queen moves`],
+  ['Also called', 'The 4-move checkmate; "Shepherd\'s Mate" in many languages'],
 ])}${ideas([
   ['🎯', 'f7 is weak', 'At the start of the game, only the king defends it.'],
   ['🤝', 'Queen and bishop', 'Bc4 and Qh5 both aim at f7.'],
@@ -67,9 +73,32 @@ ${story({ line: SCHDEF, hl: 'f6', arrows: '~f3f7', cap: '...Nf6 blocks the queen
   'The queen retreats but keeps aiming at f7.',
   'The knight blocks the f-file. f7 is safe and Black is well developed.'] } },
 `<p>${mv('e4 e5 Bc4 Nc6 Qh5 Qe7', '3...Qe7')} also works: the queen defends f7 directly. It's a little less natural because it blocks the f8 bishop for a while, but it's completely safe.</p>
+<h2 id="punish">How to punish the early queen</h2>
+<p>Stopping the mate is only half the job. After ${mv('e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6', '3...g6 4.Qf3 Nf6')}, White's queen is out alone, and many players who try Scholar's Mate keep moving it, looking for another trick. That's your chance. The key move to remember is <strong>...Nd4</strong>: the knight jumps forward, hits the queen and also eyes c2, where ...Nxc2+ would fork the king and the rook.</p>
+${story({ line: cut(SCHPUN, 10), hl: 'd4,b3,c2', arrows: '!d4b3,!d4c2', cap: '5...Nd4! hits the queen and threatens ...Nxc2+.' }, `A common try is ${mv(cut(SCHPUN, 9), '5.Qb3?')}, lining the queen up behind the bishop against f7 again. But ${mv(cut(SCHPUN, 10), '5...Nd4!')} punishes it right away: the queen is attacked, and ...Nxc2+ is coming next. Stockfish already rates Black about five pawns better.`)}
+${story({ line: SCHPUN, hl: 'b5,f7', arrows: '!b5c4,~e7f7', cap: '7...b5! The queen has to leave, and the f7 bishop falls.' }, `White's best practical try is to grab a pawn with check: ${mv(cut(SCHPUN, 11), '6.Bxf7+')} ${mv(cut(SCHPUN, 12), 'Ke7')} (the only move, and a safe one). After ${mv(cut(SCHPUN, 13), '7.Qc4')} the queen defends the bishop, but ${mv(SCHPUN, '7...b5!')} kicks it away. The queen can't stay safe and keep protecting f7, so Black wins the bishop and is a full piece up.`)}${quickCheck('After 3...g6 4.Qf3 Nf6 5.Qb3, what is Black\'s strongest move?', ['5...Nd4', '5...Qe7', '5...Bg7'], 0, '5...Nd4! attacks the queen and threatens ...Nxc2+. 5...Qe7 is safe but lets White off the hook.')}`,
+{ trainer: { title: 'Punish the early queen', orientation: 'black', practiceSide: 'black', intro: 'White keeps chasing f7 with the queen. In Practice mode you play Black and win a piece.', moves: SCHPUN, notes: [
+  'White takes the center.',
+  'Black answers in the center.',
+  'The queen comes out early and attacks e5.',
+  'Defend e5 and develop.',
+  'Now f7 is attacked twice.',
+  'Block the queen and attack it.',
+  'The queen keeps aiming at f7.',
+  'Block the f-file and develop. f7 is safe.',
+  'The queen lines up behind the bishop, aiming at f7 again.',
+  'The punishment: the knight attacks the queen and threatens Nxc2+, forking king and rook.',
+  'White takes a pawn with check to keep things going.',
+  'The only move, and it is fine: now the f7 bishop and the queen are both attacked.',
+  'The queen escapes and defends the bishop.',
+  'Kick the queen again. It cannot keep defending f7, so Black wins the bishop.'] } },
+`${story({ line: SCHG4, hl: 'd4,f3,c2', arrows: '!d4f3,!d4c2', cap: '5.g4? Nd4! The same jump works here.' }, `The same idea works against other queen moves. ${mv(cut(SCHG4, 9), '5.g4?')} threatens to kick the f6 knight with g5, but ${mv(SCHG4, '5...Nd4!')} comes first: the queen is attacked and c2 is hanging again. After the queen runs back with 6.Qd1, ...d5! opens lines while White's pieces are still at home. White's best move after 4...Nf6 is quiet development with 5.Ne2, and even then Black is completely fine.`)}
+<h2 id="black">Scholar's Mate for Black</h2>
+${story({ line: BSCH, hl: 'f2,e1', arrows: '!h4f2,!c5f2', cap: 'Reversed: Black\'s queen and c5 bishop hit f2.' }, `Black can do the same thing against f2, which only White's king defends. After ${mv(cut(BSCH, 4), '1.e4 e5 2.Bc4 Bc5')} ${mv(cut(BSCH, 5), '3.Nc3')}, the queen jumps out with ${mv(cut(BSCH, 6), '3...Qh4')}. If White attacks the queen with ${mv(cut(BSCH, 7), '4.Nf3??')}, it's ${mv(BSCH, '4...Qxf2#')}. White stops it the same way Black does: cover f2 first with ${mv('e4 e5 Bc4 Bc5 Nc3 Qh4 Qe2', '4.Qe2')} (or ${mv('e4 e5 Bc4 Bc5 Nc3 Qh4 g3', '4.g3')}, hitting the queen), and then the early queen becomes Black's problem.`)}
+<p>So whichever color you play, the rule is the same: when the enemy queen comes out early, check f7 (or f2) before anything else.</p>
 <h2 id="should-you">Should you play Scholar's Mate?</h2>
 <p>Against someone who has only just learned the rules, it wins a lot of games. Against anyone who knows the defense, it backfires. Black blocks with ...g6, develops with ...Nf6 and keeps hitting the queen, and White has spent three or four moves on one piece. Stockfish rates the position after ${mv(SCHDEF, '3...g6 4.Qf3 Nf6')} as slightly better for Black.</p>
-<p>If you like the idea of attacking f7, learn the <a href="/openings/italian-game/">Italian Game</a> or the <a href="/openings/fried-liver-attack/">Fried Liver Attack</a> instead. They use the same Bc4 idea, but with proper development, so they still work against stronger players.</p>
+<p>If you like the idea of attacking f7, learn the <a href="/openings/italian-game/">Italian Game</a> or the <a href="/openings/fried-liver-attack/">Fried Liver Attack</a> instead. They use the same Bc4 idea, but with proper development, so they still work against stronger players. Not sure what suits you? Take the <a href="/openings/which-opening-suits-you/">which opening suits you quiz</a> or read our <a href="/openings/best-chess-openings-for-beginners/">best chess openings for beginners</a> guide. And to practice both sides of Scholar's Mate in a real game, <a href="#coach">play it against the Coach</a> below.</p>
 <!-- AD SLOT (mid article) — add after AdSense approval -->
 <h2 id="mistakes">Common mistakes</h2>
 <ul>
@@ -77,20 +106,24 @@ ${story({ tag: 'li', line: cut(SCH, 6), hl: 'f7', arrows: '!h5f7,!c4f7', cap: '3
 <li><strong>Only looking at the e5 pawn.</strong> Qh5 attacks e5 too, and many beginners defend e5 and forget about f7.</li>
 <li><strong>Bringing your own queen out too early.</strong> If you try Scholar's Mate and it doesn't work, your queen becomes a target. Develop your knights and bishops first.</li>
 </ul>
-<div class="callout clubtip" data-lx><p class="mine-h">💡 Club-level tip</p><p>Every time your opponent's queen moves, take two seconds to check every square it attacks. That one habit stops Scholar's Mate, <a href="/openings/fools-mate/">Fool's Mate</a> and most early queen tricks.</p></div>`,
+<div class="callout clubtip" data-lx><p class="mine-h">💡 Club-level tip</p><p>Every time your opponent's queen moves, take two seconds to check every square it attacks. That one habit stops Scholar's Mate, <a href="/openings/fools-mate/">Fool's Mate</a> and most early queen tricks. You can train it with our free <a href="/tactics/">tactics puzzles</a>.</p></div>`,
   ],
   faq: [
     ["How many moves is Scholar's Mate?", 'Four moves: 1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6?? 4.Qxf7#. White gives checkmate on move 4.'],
     ["Is Scholar's Mate the fastest checkmate?", `No. <a href="/openings/fools-mate/">Fool's Mate</a> is faster: it ends on move 2. Scholar's Mate is simply the most common quick checkmate between beginners.`],
     ["How do you stop Scholar's Mate?", 'Defend f7 before it is attacked twice. When the queen is on h5, play ...g6; when it goes to f3, play ...Nf6. ...Qe7 also defends f7.'],
     ["Is it bad to play Scholar's Mate?", "It isn't against the rules or bad manners. It's just a poor plan against players who know the defense, because the early queen gets chased and you fall behind in development."],
-    ["Can Black do Scholar's Mate?", 'Yes, if White is careless. The same pattern works against f2, with Black\'s queen and c5 bishop both aiming at it. The defense for White is the same idea: cover f2 in time.'],
+    ["Can Black do Scholar's Mate?", 'Yes, if White is careless. The same pattern works against f2, with Black\'s queen and c5 bishop both aiming at it, for example 1.e4 e5 2.Bc4 Bc5 3.Nc3 Qh4 4.Nf3?? Qxf2#. The defense for White is the same idea: cover f2 in time with 4.Qe2 or 4.g3.'],
+    ["What is the 4-move checkmate called?", "It's called Scholar's Mate. In German, Spanish and French it is known as the \"shepherd's mate\" (Schäfermatt, mate del pastor, coup du berger). The moves are 1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6?? 4.Qxf7#."],
+    ["What is the fastest checkmate for White?", `Three moves: 1.e4 g5 2.d4 f6?? 3.Qh5#. The fastest checkmate overall is <a href="/openings/fools-mate/">Fool's Mate</a>, where Black mates on move 2 after 1.f3 e5 2.g4?? Qh4#.`],
+    ["How do you punish Scholar's Mate?", 'Block with ...g6, develop with ...Nf6, and watch for ...Nd4. If White keeps moving the queen, for example 3...g6 4.Qf3 Nf6 5.Qb3?, then 5...Nd4! attacks the queen and threatens ...Nxc2+, and Black soon wins material.'],
+    ["What should White do after 3...g6?", 'Retreat the queen to f3 (or back to d1) and then develop normally with Ne2, Nc3 and d3. The trick has failed, so stop chasing f7 and catch up in development.'],
   ],
   quiz: { side: 'b', flip: 1, items: [
     { line: 'e4 e5 Qh5', answer: 'Nc6', pool: ['g6', 'Nf6', 'Bc5', 'Ke7'], note: 'Defend e5 and develop. Now watch f7.' },
     { line: 'e4 e5 Qh5 Nc6 Bc4', answer: 'g6', pool: ['Nf6', 'd6'], note: 'Block the queen and attack it.' },
     { line: SCHDEF.split(' ').slice(0, 7).join(' '), answer: 'Nf6', pool: ['d6', 'Bg7'], note: 'Block the f-file and develop.' },
-    { line: 'e4 e5 Bc4 Nc6 Qh5', answer: 'g6', pool: ['Nf6', 'd6'], note: 'Same defense in the other move order.' },
+    { line: cut(SCHPUN, 9), answer: 'Nd4', pool: ['Qe7', 'a5', 'Bg7'], note: 'Punish the queen: attack it and threaten ...Nxc2+.' },
     { line: 'e4 e5 Bc4 Nc6 Qf3', answer: 'Nf6', pool: ['d6', 'Bc5'], note: 'The knight shuts the queen out of f7.' },
   ] },
   related: [
