@@ -2,7 +2,7 @@
 const fs = require('fs');
 const { line, sf, uciToSan } = require('./chesslib');
 const L = require('./lib');
-const pages = require('./pages').concat(require('./pages2'), require('./pages3'));
+const pages = require('./pages').concat(require('./pages2'), require('./pages3'), require('./pages4'));
 
 const SITE = '/home/claude/castleearly';
 const DEFAULT_DATE = '2026-10-30';
