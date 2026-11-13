@@ -17,6 +17,7 @@ Every opening line and puzzle on the site is checked move by move with a chess e
 - [Stalemate in Chess: Rules and Examples](https://castleearly.com/learn/stalemate/): Stalemate in chess is a draw: the player to move has no legal move but isn't in check. Clear examples, how to avoid it, and how to save lost games with it.
 - [Zugzwang in Chess: Meaning and Examples](https://castleearly.com/learn/zugzwang/): Zugzwang is when every move you can make worsens your position. Learn what it means, the famous trébuchet, the opposition in pawn endgames, and practice it.
 - [En Passant in Chess: Rules and Examples](https://castleearly.com/learn/en-passant/): En passant is a special pawn capture: take a pawn that moved two squares past yours, on the very next move only. Rules, examples and practice.
+- [Smothered Mate in Chess: Pattern, Examples and Traps](https://castleearly.com/learn/smothered-mate/): A smothered mate is checkmate by a knight when the king is boxed in by its own pieces. Learn the pattern, Philidor's legacy, three opening traps and practice.
 
 ## Openings
 - [Chess Openings for Beginners: White and Black](https://castleearly.com/openings/): A library of 18 chess openings for White and Black plus the most common opening traps, each with an interactive board, plans and a practice mode.
