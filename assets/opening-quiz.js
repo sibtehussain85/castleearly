@@ -12,6 +12,12 @@
     "london-system": { n: "London System", side: "w", a: 1, s: 3, t: 2, th: 1, st: "C", lv: 1, why: "One setup against everything, a safe king and very little to memorize." },
     "queens-gambit": { n: "Queen's Gambit", side: "w", a: 1, s: 2, t: 3, th: 2, st: "C", lv: 2, why: "Classical pressure on d5 and clear plans like the minority attack." },
     "english-opening": { n: "English Opening", side: "w", a: 0, s: 2, t: 3, th: 2, st: "C", lv: 3, why: "Control the center from the side and outplay your opponent slowly." },
+    "kings-gambit": { n: "King's Gambit", side: "w", a: 3, s: 0, t: 1, th: 2, st: "O", lv: 2, why: "The classic attacking gambit: a pawn for open lines and a fast attack on f7." },
+    "evans-gambit": { n: "Evans Gambit", side: "w", a: 3, s: 1, t: 1, th: 2, st: "O", lv: 2, why: "The Italian Game with a pawn sacrifice for a big center and quick development." },
+    "danish-gambit": { n: "Danish Gambit", side: "w", a: 3, s: 0, t: 0, th: 1, st: "O", lv: 1, why: "Two pawns for two raking bishops. Great fun in fast games." },
+    "pirc-defense": { n: "Pirc Defense", side: "e4", a: 1, s: 1, t: 3, th: 2, st: "C", lv: 3, why: "Let White build a center, then attack it with ...e5 or ...c5." },
+    "queens-gambit-accepted": { n: "Queen's Gambit Accepted", side: "d4", a: 1, s: 2, t: 2, th: 2, st: "O", lv: 2, why: "Take the pawn, develop freely and hit back with ...c5." },
+    "dutch-defense": { n: "Dutch Defense", side: "d4", a: 3, s: 1, t: 2, th: 2, st: "C", lv: 2, why: "Control e4 with the f-pawn and play for a kingside attack." },
     "sicilian-defense": { n: "Sicilian Defense", side: "e4", a: 3, s: 0, t: 2, th: 3, st: "O", lv: 2, why: "The fighting answer to 1.e4. Unbalanced games where Black plays to win." },
     "french-defense": { n: "French Defense", side: "e4", a: 1, s: 2, t: 3, th: 2, st: "C", lv: 2, why: "A rock-solid pawn chain and clear targets to attack." },
     "caro-kann-defense": { n: "Caro-Kann Defense", side: "e4", a: 0, s: 3, t: 2, th: 1, st: "C", lv: 1, why: "Super solid, easy to learn, and great in the endgame." },
@@ -31,7 +37,8 @@
     "french-defense": ["rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR", "e7,e6"], "caro-kann-defense": ["rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR", "c7,c6"],
     "scandinavian-defense": ["rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR", "d7,d5"], "petrov-defense": ["rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R", "g8,f6"],
     "kings-indian-defense": ["rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR", "d7,d6"], "nimzo-indian-defense": ["rnbqk2r/pppp1ppp/4pn2/8/1bPP4/2N5/PP2PPPP/R1BQKBNR", "f8,b4"],
-    "queens-gambit-declined": ["rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR", "e7,e6"], "slav-defense": ["rnbqkbnr/pp2pppp/2p5/3p4/2PP4/8/PP2PPPP/RNBQKBNR", "c7,c6"]
+    "queens-gambit-declined": ["rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR", "e7,e6"], "slav-defense": ["rnbqkbnr/pp2pppp/2p5/3p4/2PP4/8/PP2PPPP/RNBQKBNR", "c7,c6"],
+    "kings-gambit": ["rnbqkbnr/pppp1ppp/8/4p3/4PP2/8/PPPP2PP/RNBQKBNR", "f2,f4"], "evans-gambit": ["r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R", "b2,b4"], "danish-gambit": ["rnbqkbnr/pppp1ppp/8/8/3pP3/2P5/PP3PPP/RNBQKBNR", "c2,c3"], "pirc-defense": ["rnbqkb1r/ppp1pp1p/3p1np1/8/3PP3/2N5/PPP2PPP/R1BQKBNR", "g7,g6"], "queens-gambit-accepted": ["rnbqkbnr/ppp1pppp/8/8/2pP4/8/PP2PPPP/RNBQKBNR", "d5,c4"], "dutch-defense": ["rnbqkbnr/ppppp1pp/8/5p2/3P4/8/PPP1PPPP/RNBQKBNR", "f7,f5"]
   };
   var QS = [
     { k: "side", q: "Which color do you need an opening for?", o: [["w", "\u2654 White"], ["b", "\u265a Black"], ["both", "Both colors"]] },
